@@ -1,5 +1,5 @@
 /**
- * SpeechDictation class.
+ * Speech / `DictationRecognizer` class.
  *
  * @author NDF, 09-October-2020.
  */
@@ -11,12 +11,6 @@ export const AUDIO_SOURCE_ERROR_EVENT = 'audioSourceError';
 
 // https://github.com/microsoft/cognitive-services-speech-sdk-js/blob/master/src/common.browser/ConsoleLoggingListener.ts#L6
 export class MyErrorEventListener /* implements IEventListener<PlatformEvent> */ {
-  /* public constructor(logLevelFilter: EventType = EventType.Warning) {
-        this.privLogLevelFilter = logLevelFilter;
-    }
-    public onEvent = (event: PlatformEvent): void => {
-    } */
-
   onEvent (event) {
     if (event.name.includes('Error')) {
       console.warn('ERROR:', event.error, event);

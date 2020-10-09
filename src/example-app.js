@@ -1,5 +1,5 @@
 /**
- *
+ * A demo application of the `DictationRecognizer`.
  *
  * @author NDF, 09-October-2020.
  */
@@ -35,6 +35,8 @@ recognizer.initialize(OPT);
 
 PRE_OPT.textContent = 'Options: ' + JSON.stringify(OPT, null, 2); // Was: '\t'
 
+// Need to call each of 'recognizing', 'recognized' and 'sessionStopped' !
+
 recognizer.recognizing((e, TEXT) => {
   LOG.textContent += `Recognizing. Text := ${TEXT}\n`;
 
@@ -55,13 +57,11 @@ recognizer.sessionStopped((e, BUFFER) => {
 
 REC_START_BUTTON.addEventListener('click', async (ev) => {
   ev.preventDefault();
-
   ev.target.disabled = true;
   REC_STOP_BUTTON.disabled = false;
 
   console.debug('Recognizer start button clicked');
 
-  // recognizer.startContinuousRecognitionAsync();
   recognizer.startRecognition();
 
   // setTimeout(() => enumMediaDevices(), 5000);

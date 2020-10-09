@@ -1,24 +1,28 @@
 
 body {
-  max-width: 45rem;
+  max-width: 42rem;
   margin: 1rem auto;
-  padding: 0 .5rem;
+  padding: 0 1rem;
 }
 
 button {
+  cursor: pointer;
   font-size: large;
-  padding: .6rem 1rem;
+  padding: .6rem 2rem;
 }
 
-pre, p {
+pre,
+p {
   background: #eee;
   border: 1px solid #aaa;
+  border-radius: .25rem;
   font-size: x-small;
   margin: 1.5rem 0;
   padding: .5rem;
 }
 
-#log, #result {
+#log,
+#result {
   font-size: medium;
 }
 
@@ -35,9 +39,10 @@ pre, p {
 #recognizer-status {
   background: red center/90% url(./microphone.svg) no-repeat;
   border-radius: 50%;
+  cursor: help;
   display: inline-block;
-  height: 2.5rem;
-  width: 2.5rem;
+  height: 2.7rem;
+  width: 2.7rem;
   vertical-align: middle;
   margin-left: 1rem;
 }
@@ -46,6 +51,7 @@ pre, p {
   background-color: #5f5;
 }
 
-.recognizer-started #log {
+.recognizer-started pre,
+.recognizer-started p {
   cursor: wait;
 }
