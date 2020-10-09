@@ -4,7 +4,10 @@
  * @author NDF, 09-October-2020.
  */
 
-import { DictationRecognizer, DEFAULTS as DEF } from './dictation-recognizer.js';
+import {
+  DictationRecognizer, DEFAULTS as DEF,
+  AUDIO_SOURCE_ERROR_EVENT
+} from './dictation-recognizer.js';
 
 const OPT = {
   key:    param(/[?&]key=(\w+)/, '__EDIT_ME__'),
@@ -14,9 +17,7 @@ const OPT = {
   initialSilenceTimeoutMs: param(/initialSilenceTimeoutMs=(\d+)/, 5 * 1000),
   endSilenceTimeoutMs: param(/endSilenceTimeoutMs=(\d+)/, 5 * 1000),
   format: param(/format=(simple|detailed)/, DEF.format),
-  separator: ' ',
-
-  appId: '90605e10-09b4-11eb-88f2-25c0a50f0bd0', // Custom command App.
+  separator: ' '
 };
 
 const REC_START_BUTTON = document.querySelector('#recognizer-start-button');
@@ -37,6 +38,10 @@ recognizer.recognizing((e, TEXT) => {
 
   document.body.classList.add('recognizer-started');
   document.body.classList.remove('recognizer-stopped');
+});
+
+recognizer.recognized((e) => {
+  console.warn('>>> Recognized', e);
 });
 
 recognizer.sessionStopped((e, BUFFER) => {
@@ -71,6 +76,10 @@ REC_STOP_BUTTON.addEventListener('click', ev => {
     document.body.classList.add('recognizer-stopped');
     document.body.classList.remove('recognizer-started');
   });
+});
+
+window.addEventListener(AUDIO_SOURCE_ERROR_EVENT, ev => {
+  console.error('>>>> ERROR:', ev.detail.error, ev);
 });
 
 // ----------------------------------------------------
