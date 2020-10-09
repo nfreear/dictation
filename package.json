@@ -6,10 +6,12 @@
   "author": "Nick Freear",
   "scripts": {
     "_": "# http://localhost:9008?key=__EDIT_ME__",
-    "start": "npm run _ && live-server --port=9008 --no-browser"
+    "start": "npm run _ && live-server --port=9008 --no-browser",
+    "test": "semistandard --fix"
   },
   "devDependencies": {
-    "live-server": "^1.2.1"
+    "live-server": "^1.2.1",
+    "semistandard": "^14.2.3"
   },
   "peerDependencies": {
     "ms-speech-sdk": "https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@latest/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js"

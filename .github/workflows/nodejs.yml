@@ -1,0 +1,46 @@
+# See :~ https://github.com/actions/starter-workflows/blob/master/ci/node.js.yml
+
+name: Node CI
+
+on: [push]
+
+jobs:
+
+  build:
+    name: build & test
+    runs-on: ubuntu-latest
+
+    # https://github.com/marketplace/actions/skip-based-on-commit-message
+    if: "!contains( github.event.head_commit.message, 'ci skip' )"
+
+    strategy:
+      matrix:
+        node-version: [ 12.x ]
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: npm install, build, and test
+      run: |
+        npm ci
+        npm run build --if-present
+        npm test
+      env:
+        CI_SKIP: false
+
+  skip:
+    name: skip build & test
+    runs-on: ubuntu-latest
+    if: "contains( github.event.head_commit.message, 'ci skip' )"
+    steps:
+    - name: Skip build
+      run: echo Skipping build.
+    env:
+      CI_SKIP: true
+
+# End.

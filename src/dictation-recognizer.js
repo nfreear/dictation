@@ -4,41 +4,42 @@
  * @author NDF, 09-October-2020.
  */
 
-const { SpeechConfig, AudioConfig, SpeechRecognizer, ResultReason } = window.SpeechSDK;
+const { SpeechConfig, AudioConfig, SpeechRecognizer, ResultReason, CancellationReason } = window.SpeechSDK;
+const CustomEvent = window.CustomEvent;
 
 export const AUDIO_SOURCE_ERROR_EVENT = 'audioSourceError';
 
 // https://github.com/microsoft/cognitive-services-speech-sdk-js/blob/master/src/common.browser/ConsoleLoggingListener.ts#L6
 export class MyErrorEventListener /* implements IEventListener<PlatformEvent> */ {
-    /* public constructor(logLevelFilter: EventType = EventType.Warning) {
+  /* public constructor(logLevelFilter: EventType = EventType.Warning) {
         this.privLogLevelFilter = logLevelFilter;
     }
     public onEvent = (event: PlatformEvent): void => {
     } */
 
-    onEvent (event) {
-      if (event.name.includes('Error')) {
-        console.warn('ERROR:', event.error, event);
+  onEvent (event) {
+    if (event.name.includes('Error')) {
+      console.warn('ERROR:', event.error, event);
 
-        // 'AudioSourceErrorEvent'
-        if (event.error.includes('microphone initialization: NotAllowedError')) {
-          const EV = new CustomEvent(AUDIO_SOURCE_ERROR_EVENT, { detail: event });
-          window.dispatchEvent(EV);
-        }
+      // 'AudioSourceErrorEvent'
+      if (event.error.includes('microphone initialization: NotAllowedError')) {
+        const EV = new CustomEvent(AUDIO_SOURCE_ERROR_EVENT, { detail: event });
+        window.dispatchEvent(EV);
       }
     }
+  }
 }
 
 // ----------------------------------------------------
 
 export const DEFAULTS = {
-  key:     '__EDIT_ME__',
-  region:  'westeurope',
-  lang:    'en-GB',
-  format:  'detailed',
-  mode:    'dictation',
+  key: '__EDIT_ME__',
+  region: 'westeurope',
+  lang: 'en-GB',
+  format: 'detailed',
+  mode: 'dictation',
   initialSilenceTimeoutMs: 5 * 1000,
-  endSilenceTimeoutMs:     5 * 1000,
+  endSilenceTimeoutMs: 5 * 1000,
 
   separator: ' '
 
@@ -65,7 +66,7 @@ export class DictationRecognizer {
     speechConfig.speechRecognitionLanguage = OPT.lang;
 
     const audioConfig = AudioConfig.fromDefaultMicrophoneInput();
-    audioConfig.events.attachListener(new MyErrorEventListener);
+    audioConfig.events.attachListener(new MyErrorEventListener());
 
     const recognizer = new SpeechRecognizer(speechConfig, audioConfig);
 
@@ -94,10 +95,9 @@ export class DictationRecognizer {
       console.debug('Recognition stopped');
 
       if (callbackFn) { callbackFn(); }
-
     },
     (err) => {
-      console.error('Recognition stop error:', err)
+      console.error('Recognition stop error:', err);
     });
   }
 
@@ -108,11 +108,11 @@ export class DictationRecognizer {
       console.debug(`RECOGNIZING: Text="${TEXT}"`, e.result);
 
       const IDX = this.BUFFER.length - 1;
-      const SEARCH = `${this.BUFFER[ IDX ]}`; // Space after / No space after ??
+      const SEARCH = `${this.BUFFER[IDX]}`; // Space after / No space after ??
       const IS_INTERIM = IDX >= 0 && TEXT.indexOf(SEARCH) === 0;
       if (IS_INTERIM) {
         // Replace the entry in the buffer!
-        this.BUFFER[ IDX ] = TEXT;
+        this.BUFFER[IDX] = TEXT;
       } else {
         this.BUFFER.push(TEXT);
       }
@@ -123,7 +123,7 @@ export class DictationRecognizer {
 
   recognized (callbackFn = null) {
     this.recognizer.recognized = (s, e) => {
-      const REASON = ResultReason[ e.result.reason ] || 'Unknown';
+      const REASON = ResultReason[e.result.reason] || 'Unknown';
       const res = JSON.parse(e.privResult.privJson);
 
       console.warn('Recognized event. Reason:', REASON, res.RecognitionStatus, res, e, s);
@@ -131,8 +131,7 @@ export class DictationRecognizer {
       const STATUS_REGEX = /(EndOfDictation|InitialSilenceTimeout)/;
 
       if (REASON === 'NoMatch' && STATUS_REGEX.test(res.RecognitionStatus)) {
-        this.stopRecognition();
-        // recognizer.stopContinuousRecognitionAsync();
+        this.stopRecognition(); // WAS: recognizer.stopContinuousRecognitionAsync();
       }
 
       if (callbackFn) { callbackFn(e); }
@@ -141,27 +140,25 @@ export class DictationRecognizer {
 
   canceled (callbackFn = null) {
     this.recognizer.canceled = (s, e) => {
-        console.warn(`CANCELED: Reason=${e.reason}`);
+      console.warn(`CANCELED: Reason=${e.reason}`);
 
-        if (e.reason == CancellationReason.Error) {
-            console.error(`"CANCELED: ErrorCode=${e.errorCode}`);
-            console.warn(`"CANCELED: ErrorDetails=${e.errorDetails}`);
-            console.warn("CANCELED: Did you update the subscription info?");
-        }
+      if (e.reason === CancellationReason.Error) {
+        console.error(`"CANCELED: ErrorCode=${e.errorCode}`);
+        console.warn(`"CANCELED: ErrorDetails=${e.errorDetails}`);
+        console.warn('CANCELED: Did you update the subscription info?');
+      }
 
-        this.stopRecognition();
-        // recognizer.stopContinuousRecognitionAsync();
+      this.stopRecognition(); // WAS: recognizer.stopContinuousRecognitionAsync();
 
-        if (callbackFn) { callbackFn(e); }
-      };
+      if (callbackFn) { callbackFn(e); }
+    };
   }
 
   sessionStopped (callbackFn) {
     this.recognizer.sessionStopped = (s, e) => {
       console.debug('\n>> Session stopped event:', e, s);
 
-      this.stopRecognition();
-      // recognizer.stopContinuousRecognitionAsync();
+      this.stopRecognition(); // Was: recognizer.stopContinuousRecognitionAsync();
 
       console.debug('>> Result:', this.BUFFER);
 
