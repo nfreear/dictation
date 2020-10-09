@@ -1,0 +1,262 @@
+<!doctype html><html lang="en-GB"> <title> *Dictation test </title>
+
+<meta name="robots" content="noindex,nofollow" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<style>
+body { max-width: 45rem; margin: 1rem auto; padding: 0 .5rem; }
+button { font-size: large; padding: .6rem 1rem; }
+pre, p { background: #eee; border: 1px solid #aaa; font-size: x-small; margin: 1.5rem 0; padding: .5rem; }
+#log, #result { font-size: medium; }
+#log { min-height: 8rem; }
+#result { background: #cfc; font-size: large; line-height: 1.6; }
+#recognizer-status {
+  background: red center/90% url(https://www.svgrepo.com/show/1902/microphone.svg) no-repeat;
+  border-radius: 50%; display: inline-block; height: 2.5rem; width: 2.5rem; vertical-align: middle; margin-left: 1rem; }
+.recognizer-started #recognizer-status { background-color: #5f5; }
+
+.recognizer-started #log { cursor: wait; }
+</style>
+
+<h1> Dictation test </h1>
+
+<button id="recognizer-start-button">Start dictation</button>
+<button id="recognizer-stop-button" disabled >Stop</button>
+<i id="recognizer-status"></i>
+
+<p id="result">(No result)</p>
+
+<pre id="log">--
+</pre>
+
+<pre id="options"></pre>
+
+
+<script
+src="external/microsoft.cognitiveservices.speech.sdk.bundle.js"
+data-X-src="https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@latest/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js"
+></script>
+
+<script>
+// https://github.com/microsoft/cognitive-services-speech-sdk-js/blob/master/src/common.browser/ConsoleLoggingListener.ts#L6
+class MyErrorEventListener /* implements IEventListener<PlatformEvent> */ {
+    /* public constructor(logLevelFilter: EventType = EventType.Warning) {
+        this.privLogLevelFilter = logLevelFilter;
+    }
+    public onEvent = (event: PlatformEvent): void => {
+    } */
+
+    onEvent (event) {
+      if (event.name.includes('Error')) {
+        console.error('ERROR:', event.error, event);
+
+        if (event.error.includes('microphone initialization: NotAllowedError')) {
+          // ??
+        }
+      }
+    }
+}
+</script>
+
+
+<script>
+  const { SpeechConfig, AudioConfig, SpeechRecognizer, ResultReason } = window.SpeechSDK;
+
+  // console.debug('Reasons:', ResultReason);
+
+  const OPT = {
+    key:    param(/[?&]key=(\w+)/, '__EDIT_ME__'),
+    region: param(/region=(\w+)/, 'westeurope'),
+    lang:   param(/lang=([\w-]+)/, 'en-GB'),
+    mode:   param(/mode=(conversation|dictation)/, 'dictation'),
+    initialSilenceTimeoutMs: param(/initialSilenceTimeoutMs=(\d+)/, 5 * 1000),
+    endSilenceTimeoutMs: param(/endSilenceTimeoutMs=(\d+)/, 5 * 1000),
+    format: param(/format=(simple|detailed)/, 'detailed'),
+    separator: ' ',
+
+    appId: '90605e10-09b4-11eb-88f2-25c0a50f0bd0', // Custom command App.
+  };
+
+  const REC_START_BUTTON = document.querySelector('#recognizer-start-button');
+  const REC_STOP_BUTTON = document.querySelector('#recognizer-stop-button');
+
+  const SDK_SCRIPT = document.querySelector('script[ src *= ".speech.sdk." ]');
+
+  const LOG = document.querySelector('#log');
+  const RESULT = document.querySelector('#result');
+  const PRE_OPT = document.querySelector('#options');
+
+  // wss://westeurope.stt.speech.microsoft.com/speech/recognition/dictation/cognitiveservices/v1?language=en-GB&format=simple&Ocp-Apim-Subscription-Key=__EDIT_ME__&X-ConnectionId=__X__
+  OPT.url = `wss://${OPT.region}.stt.speech.microsoft.com/speech/recognition/${OPT.mode}/cognitiveservices/v1?initialSilenceTimeoutMs=${OPT.initialSilenceTimeoutMs}&endSilenceTimeoutMs=${OPT.endSilenceTimeoutMs}&format=${OPT.format}`;
+  OPT.urlObj = new URL(OPT.url);
+
+  const speechConfig = SpeechConfig.fromEndpoint(OPT.urlObj, OPT.key);
+  // const speechConfig = SpeechConfig.fromSubscription(KEY, REGION);
+
+  speechConfig.enableDictation();
+  speechConfig.speechRecognitionLanguage = OPT.lang;
+
+  const audioConfig = AudioConfig.fromDefaultMicrophoneInput();
+  const recognizer = new SpeechRecognizer(speechConfig, audioConfig);
+
+  audioConfig.events.attachListener(new MyErrorEventListener);
+
+  console.debug('Recognizer:', recognizer, speechConfig, audioConfig, OPT);
+  PRE_OPT.textContent = 'Options: ' + JSON.stringify(OPT, null, 2); // Was: '\t'
+
+  const BUFFER = [];
+
+  recognizer.recognizing = (s, e) => {
+    const TEXT = e.result.text;
+
+    console.log(`RECOGNIZING: Text="${TEXT}"`, e.result);
+    LOG.textContent += `Recognizing. Text := ${TEXT}\n`;
+
+    const IDX = BUFFER.length - 1;
+    const SEARCH = `${BUFFER[ IDX ]}`; // Space after / No space after ??
+    const IS_INTERIM = IDX >= 0 && TEXT.indexOf(SEARCH) === 0;
+    if (IS_INTERIM) {
+      BUFFER[ IDX ] = TEXT; // Replace!
+    } else {
+      BUFFER.push(TEXT);
+    }
+
+    document.body.classList.add('recognizer-started');
+    document.body.classList.remove('recognizer-stopped');
+  };
+
+  recognizer.recognized = (s, e) => {
+    const REASON = ResultReason[ e.result.reason ] || 'Unknown';
+    const res = JSON.parse(e.privResult.privJson);
+
+    /* if (e.result.reason == ResultReason.RecognizedSpeech) {
+      // Do something with the recognized text
+      console.warn('Recognizer event. Reason:', REASON, e.getResult().getText(), e, s);
+    } else { */
+    console.warn('Recognized event. Reason:', REASON, res.RecognitionStatus, res, e, s);
+    // }
+
+    if (REASON === 'NoMatch' && res.RecognitionStatus === 'EndOfDictation') {
+      recognizer.stopContinuousRecognitionAsync();
+    }
+  };
+
+  recognizer.canceled = (s, e) => {
+    console.log(`CANCELED: Reason=${e.reason}`);
+
+    if (e.reason == CancellationReason.Error) {
+        console.error(`"CANCELED: ErrorCode=${e.errorCode}`);
+        console.warn(`"CANCELED: ErrorDetails=${e.errorDetails}`);
+        console.warn("CANCELED: Did you update the subscription info?");
+    }
+
+    recognizer.stopContinuousRecognitionAsync();
+  };
+
+  recognizer.sessionStopped = (s, e) => {
+    console.log("\n    Session stopped event.", e, s);
+    recognizer.stopContinuousRecognitionAsync();
+
+    console.warn('Result:', BUFFER);
+    RESULT.innerHTML = `Result :~ <q>${BUFFER.join(OPT.separator)}</q>`;
+
+    document.body.classList.add('recognizer-stopped');
+    document.body.classList.remove('recognizer-started');
+  };
+
+  // Start continuous speech recognition
+  function startRecognition () {
+    recognizer.startContinuousRecognitionAsync(() => {
+      console.debug('Recognition started');
+    }, (err) => {
+      console.error('>> Recognition start error:', `[${typeof err || 'XX'}]`, err);
+    });
+  }
+
+  // Stop continuous speech recognition
+  function stopRecognition () {
+    recognizer.stopContinuousRecognitionAsync(() => {
+      console.debug('Recognition stopped');
+
+      document.body.classList.add('recognizer-stopped');
+      document.body.classList.remove('recognizer-started');
+    }, (err) => {
+      console.error('Recognition stop error:', err)
+    });
+  }
+
+  REC_START_BUTTON.addEventListener('click', async (ev) => {
+    ev.preventDefault();
+
+    ev.target.disabled = true;
+    REC_STOP_BUTTON.disabled = false;
+
+    console.debug('Recognizer start button clicked');
+
+    // recognizer.startContinuousRecognitionAsync();
+    startRecognition();
+
+    // setTimeout(() => enumMediaDevices(), 5000);
+  });
+
+  REC_STOP_BUTTON.addEventListener('click', ev => {
+    ev.preventDefault();
+    ev.target.disabled = true;
+    REC_START_BUTTON.disabled = false;
+
+    console.debug('Recognizer stop button clicked');
+
+    recognizer.stopContinuousRecognitionAsync();
+  });
+
+  // ----------------------------------------------------
+  // Error handling ??
+
+  SDK_SCRIPT.addEventListener('error', ev => {
+    console.error('SDK error:', ev);
+  });
+
+  // -----------------------------------------------------
+
+  function enumMediaDevices () {
+    navigator.mediaDevices.enumerateDevices()
+      .then(function(devices) {
+        /* devices.forEach(function(device) {
+          console.log(device.kind + ": " + device.label +
+                " id = " + device.deviceId);
+        }); */
+        console.warn('Devices:', devices);
+      })
+    .catch(err => console.error('ERROR:', err));
+  }
+
+  function param (regex, def = null) {
+    const matches = window.location.href.match(regex);
+    return matches ? matches[ 1 ] : def;
+  }
+</script>
+
+
+<pre>
+
+NDF, 08-Oct-2020.
+
+ * https://gist.github.com/nfreear/f875994f45c97518cd8c42c786998c84;
+ * https://github.com/Azure-Samples/cognitive-services-speech-sdk/issues/131 ~~ !!
+
+</pre>
+</html>
+
+<!--
+* https://docs.microsoft.com/en-us/azure/cognitive-services/speech-service/get-started-speech-to-text?tabs=script%2Cwindowsinstall&pivots=programming-language-javascript;
+* https://docs.microsoft.com/en-us/azure/cognitive-services/speech-service/speech-sdk?tabs=browser%2Cubuntu%2Cios-xcode%2Cmac-xcode%2Candroid-studio#get-the-speech-sdk;
+
+* https://docs.microsoft.com/en-us/javascript/api/microsoft-cognitiveservices-speech-sdk/?view=azure-node-latest
+
+* YES !! ~~ https://docs.microsoft.com/en-us/azure/cognitive-services/speech-service/get-started-speech-to-text?tabs=script%2Cwindowsinstall&pivots=programming-language-javascript#continuous-recognition;
+
+==
+https://github.com/microsoft/cognitive-services-speech-sdk-js/blob/v1.13.1/src/common.browser/MicAudioSource.ts#L134-L145
+>>
+microsoft.cognitiveservices.speech.sdk.bundle-min.js:1 undefined | undefined | privName: AudioSourceErrorEvent | privEventId: D0FFB17607834013BFD72356FC82D571 | privEventTime: 2020-10-08T14:32:25.364Z | privEventType: 3 | privMetadata: {} | privAudioSourceId: A660C16B24584A7F9FA6694F012B35DF | privError: Error occurred during microphone initialization: NotAllowedError: Permission dismissed
+-->

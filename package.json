@@ -1,0 +1,17 @@
+{
+  "private": true,
+  "name": "@ndf/speech-dictation-test",
+  "description": "Mastering 'endSilenceTimeoutMs' in Speech SDK dictation mode! (08-Oct-2020)",
+  "repository": "https://github.com/nfreear/dictation.git",
+  "author": "Nick Freear",
+  "scripts": {
+    "_": "# http://localhost:9008?key=__EDIT_ME__",
+    "start": "npm run _ && live-server --port=9008 --no-browser"
+  },
+  "devDependencies": {
+    "live-server": "^1.2.1"
+  },
+  "peerDependencies": {
+    "ms-speech-sdk": "https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@latest/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js"
+  }
+}
