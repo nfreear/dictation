@@ -33,7 +33,7 @@ pre, p {
 }
 
 #recognizer-status {
-  background: red center/90% url(https://www.svgrepo.com/show/1902/microphone.svg) no-repeat;
+  background: red center/90% url(./microphone.svg) no-repeat;
   border-radius: 50%;
   display: inline-block;
   height: 2.5rem;
