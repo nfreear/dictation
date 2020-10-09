@@ -3,20 +3,7 @@
 <meta name="robots" content="noindex,nofollow" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<style>
-body { max-width: 45rem; margin: 1rem auto; padding: 0 .5rem; }
-button { font-size: large; padding: .6rem 1rem; }
-pre, p { background: #eee; border: 1px solid #aaa; font-size: x-small; margin: 1.5rem 0; padding: .5rem; }
-#log, #result { font-size: medium; }
-#log { min-height: 8rem; }
-#result { background: #cfc; font-size: large; line-height: 1.6; }
-#recognizer-status {
-  background: red center/90% url(https://www.svgrepo.com/show/1902/microphone.svg) no-repeat;
-  border-radius: 50%; display: inline-block; height: 2.5rem; width: 2.5rem; vertical-align: middle; margin-left: 1rem; }
-.recognizer-started #recognizer-status { background-color: #5f5; }
-
-.recognizer-started #log { cursor: wait; }
-</style>
+<link rel="stylesheet" href="src/style.css" />
 
 <h1> Dictation test </h1>
 
@@ -37,7 +24,11 @@ src="external/microsoft.cognitiveservices.speech.sdk.bundle.js"
 data-X-src="https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@latest/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js"
 ></script>
 
-<script>
+<script type="module" src="src/example-app.js"></script>
+
+
+<!--  ====================================================== -->
+<script type="XX">
 // https://github.com/microsoft/cognitive-services-speech-sdk-js/blob/master/src/common.browser/ConsoleLoggingListener.ts#L6
 class MyErrorEventListener /* implements IEventListener<PlatformEvent> */ {
     /* public constructor(logLevelFilter: EventType = EventType.Warning) {
@@ -50,6 +41,7 @@ class MyErrorEventListener /* implements IEventListener<PlatformEvent> */ {
       if (event.name.includes('Error')) {
         console.error('ERROR:', event.error, event);
 
+        // 'AudioSourceErrorEvent'
         if (event.error.includes('microphone initialization: NotAllowedError')) {
           // ??
         }
@@ -59,7 +51,7 @@ class MyErrorEventListener /* implements IEventListener<PlatformEvent> */ {
 </script>
 
 
-<script>
+<script type="XX">
   const { SpeechConfig, AudioConfig, SpeechRecognizer, ResultReason } = window.SpeechSDK;
 
   // console.debug('Reasons:', ResultReason);

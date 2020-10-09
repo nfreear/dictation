@@ -1,0 +1,13 @@
+
+body { max-width: 45rem; margin: 1rem auto; padding: 0 .5rem; }
+button { font-size: large; padding: .6rem 1rem; }
+pre, p { background: #eee; border: 1px solid #aaa; font-size: x-small; margin: 1.5rem 0; padding: .5rem; }
+#log, #result { font-size: medium; }
+#log { min-height: 8rem; }
+#result { background: #cfc; font-size: large; line-height: 1.6; }
+#recognizer-status {
+  background: red center/90% url(https://www.svgrepo.com/show/1902/microphone.svg) no-repeat;
+  border-radius: 50%; display: inline-block; height: 2.5rem; width: 2.5rem; vertical-align: middle; margin-left: 1rem; }
+.recognizer-started #recognizer-status { background-color: #5f5; }
+
+.recognizer-started #log { cursor: wait; }
