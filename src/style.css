@@ -1,8 +1,8 @@
 
 body {
-  max-width: 42rem;
+  max-width: 46rem;
   margin: 1rem auto;
-  padding: 0 1rem;
+  padding: 0 .8rem;
 }
 
 button {
@@ -11,14 +11,25 @@ button {
   padding: .6rem 2rem;
 }
 
+
+
+label {
+  display: block;
+}
+
 pre,
-p {
-  background: #eee;
+textarea {
+  background: #e6e6e6;
   border: 1px solid #aaa;
   border-radius: .25rem;
   font-size: x-small;
   margin: 1.5rem 0;
   padding: .5rem;
+}
+
+textarea {
+  margin: 0;
+  width: 98%;
 }
 
 #log,

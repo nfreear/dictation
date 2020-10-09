@@ -45,6 +45,7 @@ export const DEFAULTS = {
 export class DictationRecognizer {
   constructor () {
     this.recognizer = null;
+    this.OPT = {};
     this.BUFFER = [];
   }
 
@@ -67,6 +68,7 @@ export class DictationRecognizer {
     console.debug('Recognizer:', recognizer, speechConfig, audioConfig, OPT);
 
     this.recognizer = recognizer;
+    this.OPT = OPT;
 
     return OPT;
   }
@@ -111,7 +113,7 @@ export class DictationRecognizer {
         this.BUFFER.push(TEXT);
       }
 
-      if (callbackFn) { callbackFn(e, TEXT); }
+      if (callbackFn) { callbackFn(e, this.getRecognizedText()); }
     };
   }
 
@@ -156,7 +158,11 @@ export class DictationRecognizer {
 
       console.debug('>> Result:', this.BUFFER);
 
-      if (callbackFn) { callbackFn(e, this.BUFFER); }
+      if (callbackFn) { callbackFn(e, this.getRecognizedText()); }
     };
+  }
+
+  getRecognizedText () {
+    return this.BUFFER.join(this.OPT.separator);
   }
 }

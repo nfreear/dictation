@@ -38,6 +38,7 @@ PRE_OPT.textContent = 'Options: ' + JSON.stringify(OPT, null, 2); // Was: '\t'
 // Need to call each of 'recognizing', 'recognized' and 'sessionStopped' !
 
 recognizer.recognizing((e, TEXT) => {
+  RESULT.value = TEXT;
   LOG.textContent += `Recognizing. Text := ${TEXT}\n`;
 
   document.body.classList.add('recognizer-started');
@@ -48,8 +49,9 @@ recognizer.recognized((e) => {
   console.warn('>>> Recognized', e);
 });
 
-recognizer.sessionStopped((e, BUFFER) => {
-  RESULT.innerHTML = `Result :~ <q>${BUFFER.join(OPT.separator)}</q>`;
+recognizer.sessionStopped((e, TEXT) => {
+  RESULT.value = TEXT;
+  // Was: RESULT.innerHTML = `Result :~ <q>${TEXT}</q>`;
 
   document.body.classList.add('recognizer-stopped');
   document.body.classList.remove('recognizer-started');
