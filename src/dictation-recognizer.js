@@ -20,9 +20,12 @@ export class MyErrorEventListener /* implements IEventListener<PlatformEvent> */
 
       // 'AudioSourceErrorEvent'
       if (event.error.includes('microphone initialization: NotAllowedError')) {
-        const EV = new CustomEvent(AUDIO_SOURCE_ERROR_EVENT, { detail: { event, micNotAllowed: true }});
+        const EV = new CustomEvent(AUDIO_SOURCE_ERROR_EVENT, { detail: { event, micNotAllowed: true } });
         window.dispatchEvent(EV);
       }
+    } else {
+      // Non-error, e.g. 'AudioStreamNodeAttachedEvent' etc.
+      console.debug('Event:', event);
     }
   }
 }
@@ -119,7 +122,7 @@ export class DictationRecognizer {
   }
 
   recognizing (callbackFn = null) {
-    this.recognizer.recognizing = (s, e) => {
+    this.recognizer.recognizing = (s, e) => { // 'Sender', 'Event'
       const TEXT = e.result.text;
 
       console.debug(`RECOGNIZING: Text="${TEXT}"`, e.result);
