@@ -1,6 +1,7 @@
 
 body {
-  max-width: 46rem;
+  min-width: 30rem;
+  max-width: 58rem;
   margin: 1rem auto;
   padding: 0 .8rem;
 }
@@ -10,8 +11,6 @@ button {
   font-size: large;
   padding: .6rem 2rem;
 }
-
-
 
 label {
   display: block;
@@ -38,7 +37,7 @@ textarea {
 }
 
 #log {
-  min-height: 8rem;
+  min-height: 10rem;
 }
 
 #result {
@@ -47,10 +46,14 @@ textarea {
   line-height: 1.6;
 }
 
+.recognizer-error #result {
+  background: #fcc;
+}
+
 #recognizer-status {
   background: red center/90% url(./microphone.svg) no-repeat;
   border-radius: 50%;
-  cursor: help;
+  /* cursor: help; */
   display: inline-block;
   height: 2.7rem;
   width: 2.7rem;
@@ -65,4 +68,8 @@ textarea {
 .recognizer-started pre,
 .recognizer-started p {
   cursor: wait;
+}
+
+.hide {
+  display: none;
 }

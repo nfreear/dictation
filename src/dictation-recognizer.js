@@ -2,14 +2,15 @@
  * Speech / `DictationRecognizer` class.
  *
  * @author NDF, 09-October-2020.
+ *
+ * @see https://docs.microsoft.com/en-us/javascript/api/microsoft-cognitiveservices-speech-sdk/?view=azure-node-latest
+ * @see https://github.com/microsoft/cognitive-services-speech-sdk-js
  */
 
 const { SpeechConfig, AudioConfig, SpeechRecognizer, ResultReason, CancellationReason, OutputFormat } = window.SpeechSDK;
 const CustomEvent = window.CustomEvent;
 
 export const AUDIO_SOURCE_ERROR_EVENT = 'audioSourceError';
-
-console.debug('>> ResultReason:', ResultReason);
 
 // https://github.com/microsoft/cognitive-services-speech-sdk-js/blob/master/src/common.browser/ConsoleLoggingListener.ts#L6
 export class MyErrorEventListener /* implements IEventListener<PlatformEvent> */ {
@@ -19,7 +20,7 @@ export class MyErrorEventListener /* implements IEventListener<PlatformEvent> */
 
       // 'AudioSourceErrorEvent'
       if (event.error.includes('microphone initialization: NotAllowedError')) {
-        const EV = new CustomEvent(AUDIO_SOURCE_ERROR_EVENT, { detail: event });
+        const EV = new CustomEvent(AUDIO_SOURCE_ERROR_EVENT, { detail: { event, micNotAllowed: true }});
         window.dispatchEvent(EV);
       }
     }
@@ -32,11 +33,12 @@ export const DEFAULTS = {
   key: '__EDIT_ME__',
   region: 'westeurope',
   lang: 'en-GB',
-  format: OutputFormat.Detailed, // Was: 'Detailed',
+  format: 'detailed', // Was: OutputFormat.Detailed,
   mode: 'dictation',
   initialSilenceTimeoutMs: 5 * 1000,
   endSilenceTimeoutMs: 5 * 1000,
-  stopStatusRegex: '(Not__EndOfDictation|InitialSilenceTimeout)',
+  audioLogging: false,
+  stopStatusRegex: '(NOT__EndOfDictation|InitialSilenceTimeout)',
 
   separator: ' '
 
@@ -53,10 +55,15 @@ export class DictationRecognizer {
   }
 
   reset () {
-    this.interims = [];
-    this.BUFFER = [];
+    this.lastOffset = null;
+    this.interims = []; // Hypotheses.
+    this.BUFFER = []; // Final text.
   }
 
+  /**
+   * @see https://docs.microsoft.com/en-us/javascript/api/microsoft-cognitiveservices-speech-sdk/speechconfig?view=azure-node-latest
+   * @see https://github.com/microsoft/cognitive-services-speech-sdk-js/blob/master/src/sdk/SpeechConfig.ts
+   */
   initialize (OPT = {}) {
     // wss://westeurope.stt.speech.microsoft.com/speech/recognition/dictation/cognitiveservices/v1?language=en-GB&format=simple&Ocp-Apim-Subscription-Key=__EDIT_ME__&X-ConnectionId=__X__
     OPT.url = `wss://${OPT.region}.stt.speech.microsoft.com/speech/recognition/${OPT.mode}/cognitiveservices/v1?initialSilenceTimeoutMs=${OPT.initialSilenceTimeoutMs || ''}&endSilenceTimeoutMs=${OPT.endSilenceTimeoutMs}&`; // format=${OPT.format}
@@ -67,7 +74,10 @@ export class DictationRecognizer {
 
     speechConfig.enableDictation();
     speechConfig.speechRecognitionLanguage = OPT.lang;
-    speechConfig.outputFormat = OPT.format;
+    speechConfig.outputFormat = OPT.format === 'detailed' ? OutputFormat.Detailed : OutputFormat.Simple;
+    if (OPT.audioLogging) {
+      speechConfig.enableAudioLogging();
+    }
 
     const audioConfig = AudioConfig.fromDefaultMicrophoneInput();
     audioConfig.events.attachListener(new MyErrorEventListener());
@@ -92,7 +102,7 @@ export class DictationRecognizer {
       if (callbackFn) { callbackFn('Recognition started'); }
     },
     (err) => {
-      console.error('>> Recognition start error:', `[${typeof err || 'XX'}]`, err);
+      console.error('Recognition start error:', `[${typeof err || 'XX'}]`, err);
     });
   }
 
@@ -116,13 +126,17 @@ export class DictationRecognizer {
 
       const IDX = this.interims.length - 1;
       const SEARCH = `${this.interims[IDX]}`; // Space after / No space after ??
-      const IS_INTERIM = IDX >= 0 && TEXT.indexOf(SEARCH) === 0;
-      if (IS_INTERIM) {
+      const contains = IDX >= 0 && TEXT.indexOf(SEARCH) === 0;
+      const offsetsMatch = e.result.offset === this.lastOffset;
+
+      if (contains || offsetsMatch) {
         // Replace the entry in the buffer!
         this.interims[IDX] = TEXT;
       } else {
         this.interims.push(TEXT);
       }
+
+      this.lastOffset = e.result.offset;
 
       if (callbackFn) { callbackFn(e, this.getInterimText()); }
     };
@@ -134,13 +148,13 @@ export class DictationRecognizer {
       const strReason = ResultReason[nReason] || 'Unknown';
       const res = JSON.parse(e.privResult.privJson);
 
-      const STATUS_REGEX = new RegExp(this.OPT.stopStatusRegex); // /(Not_EndOfDictation|InitialSilenceTimeout)/;
+      const STATUS_REGEX = new RegExp(this.OPT.stopStatusRegex);
 
       if (nReason === ResultReason.NoMatch && STATUS_REGEX.test(res.RecognitionStatus)) {
         this.stopRecognition(); // WAS: recognizer.stopContinuousRecognitionAsync();
       }
 
-      // We often do NOT see 'RecognizedSpeech' !
+      // We don't see 'RecognizedSpeech' in dictation mode!
       if (nReason === ResultReason.RecognizedSpeech) {
         const TEXT = e.getResult().getText();
 
@@ -152,7 +166,7 @@ export class DictationRecognizer {
       } else {
         console.debug('Recognizer event. Reason:', strReason, res.RecognitionStatus, res, e, s);
 
-        if (callbackFn) { callbackFn(e, null); }
+        if (callbackFn) { callbackFn(e, null, res.RecognitionStatus); }
       }
     };
   }
@@ -175,11 +189,9 @@ export class DictationRecognizer {
 
   sessionStopped (callbackFn) {
     this.recognizer.sessionStopped = (s, e) => {
-      console.debug('\n>> Session stopped event:', e, s);
-
       this.stopRecognition(); // Was: recognizer.stopContinuousRecognitionAsync();
 
-      console.debug('>> sessionStopped. Result:', this.getRecognizedText());
+      console.debug(`\n>> Session stopped event. Result: "${this.getRecognizedText()}"`, e, s);
 
       if (callbackFn) { callbackFn(e, this.getRecognizedText()); }
     };
