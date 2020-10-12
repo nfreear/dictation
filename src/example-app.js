@@ -60,6 +60,9 @@ recognizer.sessionStopped((e, TEXT) => {
   RESULT.value = TEXT;
   // Was: RESULT.innerHTML = `Result :~ <q>${TEXT}</q>`;
 
+  REC_STOP_BUTTON.disabled = true;
+  REC_START_BUTTON.disabled = false;
+
   document.body.classList.add('recognizer-stopped');
   document.body.classList.remove('recognizer-started');
 });

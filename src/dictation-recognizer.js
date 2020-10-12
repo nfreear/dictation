@@ -134,7 +134,7 @@ export class DictationRecognizer {
       const strReason = ResultReason[nReason] || 'Unknown';
       const res = JSON.parse(e.privResult.privJson);
 
-      const STATUS_REGEX = new Regex(this.OPT.stopStatusRegex); // /(Not_EndOfDictation|InitialSilenceTimeout)/;
+      const STATUS_REGEX = new RegExp(this.OPT.stopStatusRegex); // /(Not_EndOfDictation|InitialSilenceTimeout)/;
 
       if (nReason === ResultReason.NoMatch && STATUS_REGEX.test(res.RecognitionStatus)) {
         this.stopRecognition(); // WAS: recognizer.stopContinuousRecognitionAsync();
