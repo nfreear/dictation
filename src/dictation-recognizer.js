@@ -4,10 +4,12 @@
  * @author NDF, 09-October-2020.
  */
 
-const { SpeechConfig, AudioConfig, SpeechRecognizer, ResultReason, CancellationReason } = window.SpeechSDK;
+const { SpeechConfig, AudioConfig, SpeechRecognizer, ResultReason, CancellationReason, OutputFormat } = window.SpeechSDK;
 const CustomEvent = window.CustomEvent;
 
 export const AUDIO_SOURCE_ERROR_EVENT = 'audioSourceError';
+
+console.debug('>> ResultReason:', ResultReason);
 
 // https://github.com/microsoft/cognitive-services-speech-sdk-js/blob/master/src/common.browser/ConsoleLoggingListener.ts#L6
 export class MyErrorEventListener /* implements IEventListener<PlatformEvent> */ {
@@ -30,10 +32,11 @@ export const DEFAULTS = {
   key: '__EDIT_ME__',
   region: 'westeurope',
   lang: 'en-GB',
-  format: 'detailed',
+  format: OutputFormat.Detailed, // Was: 'Detailed',
   mode: 'dictation',
   initialSilenceTimeoutMs: 5 * 1000,
   endSilenceTimeoutMs: 5 * 1000,
+  stopStatusRegex: '(Not__EndOfDictation|InitialSilenceTimeout)',
 
   separator: ' '
 
@@ -46,12 +49,17 @@ export class DictationRecognizer {
   constructor () {
     this.recognizer = null;
     this.OPT = {};
+    this.reset();
+  }
+
+  reset () {
+    this.interims = [];
     this.BUFFER = [];
   }
 
   initialize (OPT = {}) {
     // wss://westeurope.stt.speech.microsoft.com/speech/recognition/dictation/cognitiveservices/v1?language=en-GB&format=simple&Ocp-Apim-Subscription-Key=__EDIT_ME__&X-ConnectionId=__X__
-    OPT.url = `wss://${OPT.region}.stt.speech.microsoft.com/speech/recognition/${OPT.mode}/cognitiveservices/v1?initialSilenceTimeoutMs=${OPT.initialSilenceTimeoutMs}&endSilenceTimeoutMs=${OPT.endSilenceTimeoutMs}&format=${OPT.format}`;
+    OPT.url = `wss://${OPT.region}.stt.speech.microsoft.com/speech/recognition/${OPT.mode}/cognitiveservices/v1?initialSilenceTimeoutMs=${OPT.initialSilenceTimeoutMs || ''}&endSilenceTimeoutMs=${OPT.endSilenceTimeoutMs}&`; // format=${OPT.format}
     OPT.urlObj = new URL(OPT.url);
 
     const speechConfig = SpeechConfig.fromEndpoint(OPT.urlObj, OPT.key);
@@ -59,26 +67,29 @@ export class DictationRecognizer {
 
     speechConfig.enableDictation();
     speechConfig.speechRecognitionLanguage = OPT.lang;
+    speechConfig.outputFormat = OPT.format;
 
     const audioConfig = AudioConfig.fromDefaultMicrophoneInput();
     audioConfig.events.attachListener(new MyErrorEventListener());
 
     const recognizer = new SpeechRecognizer(speechConfig, audioConfig);
 
-    console.debug('Recognizer:', recognizer, speechConfig, audioConfig, OPT);
-
     this.recognizer = recognizer;
     this.OPT = OPT;
+
+    console.debug(`${this.constructor.name}:`, this);
 
     return OPT;
   }
 
   // Start continuous speech recognition
   startRecognition (callbackFn = null) {
+    this.reset();
+
     this.recognizer.startContinuousRecognitionAsync(() => {
       console.debug('Recognition started');
 
-      if (callbackFn) { callbackFn(); }
+      if (callbackFn) { callbackFn('Recognition started'); }
     },
     (err) => {
       console.error('>> Recognition start error:', `[${typeof err || 'XX'}]`, err);
@@ -90,7 +101,7 @@ export class DictationRecognizer {
     this.recognizer.stopContinuousRecognitionAsync(() => {
       console.debug('Recognition stopped');
 
-      if (callbackFn) { callbackFn(); }
+      if (callbackFn) { callbackFn('Recognition stopped'); }
     },
     (err) => {
       console.error('Recognition stop error:', err);
@@ -103,34 +114,46 @@ export class DictationRecognizer {
 
       console.debug(`RECOGNIZING: Text="${TEXT}"`, e.result);
 
-      const IDX = this.BUFFER.length - 1;
-      const SEARCH = `${this.BUFFER[IDX]}`; // Space after / No space after ??
+      const IDX = this.interims.length - 1;
+      const SEARCH = `${this.interims[IDX]}`; // Space after / No space after ??
       const IS_INTERIM = IDX >= 0 && TEXT.indexOf(SEARCH) === 0;
       if (IS_INTERIM) {
         // Replace the entry in the buffer!
-        this.BUFFER[IDX] = TEXT;
+        this.interims[IDX] = TEXT;
       } else {
-        this.BUFFER.push(TEXT);
+        this.interims.push(TEXT);
       }
 
-      if (callbackFn) { callbackFn(e, this.getRecognizedText()); }
+      if (callbackFn) { callbackFn(e, this.getInterimText()); }
     };
   }
 
   recognized (callbackFn = null) {
     this.recognizer.recognized = (s, e) => {
-      const REASON = ResultReason[e.result.reason] || 'Unknown';
+      const nReason = e.result.reason;
+      const strReason = ResultReason[nReason] || 'Unknown';
       const res = JSON.parse(e.privResult.privJson);
 
-      console.warn('Recognized event. Reason:', REASON, res.RecognitionStatus, res, e, s);
+      const STATUS_REGEX = new Regex(this.OPT.stopStatusRegex); // /(Not_EndOfDictation|InitialSilenceTimeout)/;
 
-      const STATUS_REGEX = /(EndOfDictation|InitialSilenceTimeout)/;
-
-      if (REASON === 'NoMatch' && STATUS_REGEX.test(res.RecognitionStatus)) {
+      if (nReason === ResultReason.NoMatch && STATUS_REGEX.test(res.RecognitionStatus)) {
         this.stopRecognition(); // WAS: recognizer.stopContinuousRecognitionAsync();
       }
 
-      if (callbackFn) { callbackFn(e); }
+      // We often do NOT see 'RecognizedSpeech' !
+      if (nReason === ResultReason.RecognizedSpeech) {
+        const TEXT = e.getResult().getText();
+
+        console.warn('>> Recognized event. Reason:', strReason, TEXT, res.RecognitionStatus, res, e, s);
+
+        this.BUFFER.push(TEXT);
+
+        if (callbackFn) { callbackFn(e, this.getRecognizedText()); }
+      } else {
+        console.debug('Recognizer event. Reason:', strReason, res.RecognitionStatus, res, e, s);
+
+        if (callbackFn) { callbackFn(e, null); }
+      }
     };
   }
 
@@ -156,13 +179,17 @@ export class DictationRecognizer {
 
       this.stopRecognition(); // Was: recognizer.stopContinuousRecognitionAsync();
 
-      console.debug('>> Result:', this.BUFFER);
+      console.debug('>> sessionStopped. Result:', this.getRecognizedText());
 
       if (callbackFn) { callbackFn(e, this.getRecognizedText()); }
     };
   }
 
+  getInterimText () {
+    return this.interims.join(this.OPT.separator);
+  }
+
   getRecognizedText () {
-    return this.BUFFER.join(this.OPT.separator);
+    return this.BUFFER.length ? this.BUFFER.join(this.OPT.separator) : this.getInterimText();
   }
 }

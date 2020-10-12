@@ -17,6 +17,8 @@ const OPT = {
   initialSilenceTimeoutMs: param(/initialSilenceTimeoutMs=(\d+)/, 5 * 1000),
   endSilenceTimeoutMs: param(/endSilenceTimeoutMs=(\d+)/, 5 * 1000),
   format: param(/format=(simple|detailed)/, DEF.format),
+  stopStatusRegex: DEF.stopStatusRegex,
+
   separator: ' '
 };
 
@@ -39,14 +41,19 @@ PRE_OPT.textContent = 'Options: ' + JSON.stringify(OPT, null, 2); // Was: '\t'
 
 recognizer.recognizing((e, TEXT) => {
   RESULT.value = TEXT;
-  LOG.textContent += `Recognizing. Text := ${TEXT}\n`;
+  LOG.textContent += `Recognizing := ${TEXT}\n`;
 
   document.body.classList.add('recognizer-started');
   document.body.classList.remove('recognizer-stopped');
 });
 
-recognizer.recognized((e) => {
-  console.warn('>>> Recognized', e);
+recognizer.recognized((e, TEXT) => {
+  console.warn('>>> Recognized:', e, TEXT);
+
+  if (TEXT) {
+    RESULT.value = TEXT;
+    LOG.textContent += `>Recognized. Text := ${TEXT}\n`;
+  }
 });
 
 recognizer.sessionStopped((e, TEXT) => {
