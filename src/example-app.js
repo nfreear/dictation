@@ -5,15 +5,14 @@
  */
 
 import {
-  DictationRecognizer, DEFAULTS as DEF
-  /* AUDIO_SOURCE_ERROR_EVENT */
+  DictationRecognizer /* DEFAULTS as DEF, AUDIO_SOURCE_ERROR_EVENT */
 } from './dictation-recognizer.js';
 
 import { webApiSpeechRecogDemo } from './web-api-speech-recog.js';
 
 const USE_WEB_API = param(/webapi=(true)/);
 
-const OPT = {
+/* const OPT = {
   key: param(/[?&]key=(\w+)/, '__EDIT_ME__'),
   region: param(/region=(\w+)/, 'westeurope'),
   lang: param(/lang=([\w-]+)/, 'en-GB'),
@@ -25,7 +24,7 @@ const OPT = {
   stopStatusRegex: DEF.stopStatusRegex,
 
   separator: ' '
-};
+}; */
 
 const REC_START_BUTTON = document.querySelector('#recognizer-start-button');
 const REC_STOP_BUTTON = document.querySelector('#recognizer-stop-button');
@@ -45,29 +44,36 @@ if (USE_WEB_API) {
 export function exampleApp () {
   const recognizer = new DictationRecognizer();
 
-  recognizer.initialize(OPT);
+  // Was: recognizer.initialize(OPT);
+  const OPT = recognizer.getConfiguration();
 
   PRE_OPT.textContent = 'Options: ' + JSON.stringify(OPT, null, 2); // Was: '\t'
-
-  // Need to call each of 'recognizing', 'recognized' and 'sessionStopped' !
 
   // recognizer.addEventListener('result', ev => console.warn('Event: result.', ev));
 
   recognizer.onresult = (ev) => {
-    const TEXT = ev._data.results[0][0].transcript;
-    const SOURCE = ev._source;
+    const TEXT = ev.results[0][0].transcript;
+    // Was: const TEXT = ev._data.results[0][0].transcript;
+    const isFinal = ev.results[0].isFinal;
+    const SOURCE = ev.data.source;
 
     console.warn('Result event:', ev);
 
     RESULT.textContent = TEXT; // Or: RESULT.value!
     LOG.textContent += `Result := ${TEXT} (${SOURCE})\n`;
 
-    onRecognitionStart();
+    if (isFinal) {
+      onRecognitionStop();
+    } else {
+      onRecognitionStart();
+    }
   };
 
   recognizer.onend = (ev) => {
     console.warn('End event:', ev);
     LOG.textContent += '> End.\n';
+
+    onRecognitionStop();
   };
 
   recognizer.onstart = ev => {
@@ -89,30 +95,6 @@ export function exampleApp () {
       LOG.textContent = '> Warning: microphone blocked.';
     }
   };
-
-  /* recognizer.recognizing((e, TEXT) => {
-    RESULT.textContent = TEXT; // Or: RESULT.value!
-    LOG.textContent += `Recognizing := ${TEXT}\n`;
-
-    onRecognitionStart();
-  });
-
-  recognizer.recognized((e, TEXT, status) => {
-    console.warn('>> Recognized:', e, TEXT, status);
-
-    // if (TEXT) {
-    RESULT.value = recognizer.getRecognizedText();
-    LOG.textContent += `>Recognized := ${recognizer.getRecognizedText()} (${status})\n`;
-    // }
-  });
-
-  recognizer.sessionStopped((e, TEXT) => {
-    RESULT.value = TEXT;
-    // Was: RESULT.innerHTML = `Result :~ <q>${TEXT}</q>`;
-    LOG.textContent += '>Session end.\n';
-
-    onRecognitionStop();
-  }); */
 
   // ----------------------------------------------------
   // Button events.
