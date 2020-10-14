@@ -5,19 +5,13 @@
  */
 
 import {
-  DictationRecognizer, DEFAULTS as DEF,
-  AUDIO_SOURCE_ERROR_EVENT
+  DictationRecognizer, DEFAULTS as DEF
+  /* AUDIO_SOURCE_ERROR_EVENT */
 } from './dictation-recognizer.js';
 
 import { webApiSpeechRecogDemo } from './web-api-speech-recog.js';
 
 const USE_WEB_API = param(/webapi=(true)/);
-
-if (USE_WEB_API) {
-  webApiSpeechRecogDemo();
-} else {
-  exampleApp();
-}
 
 const OPT = {
   key: param(/[?&]key=(\w+)/, '__EDIT_ME__'),
@@ -42,6 +36,12 @@ const LOG = document.querySelector('#log');
 const RESULT = document.querySelector('#result');
 const PRE_OPT = document.querySelector('#options');
 
+if (USE_WEB_API) {
+  webApiSpeechRecogDemo();
+} else {
+  exampleApp();
+}
+
 export function exampleApp () {
   const recognizer = new DictationRecognizer();
 
@@ -51,7 +51,46 @@ export function exampleApp () {
 
   // Need to call each of 'recognizing', 'recognized' and 'sessionStopped' !
 
-  recognizer.recognizing((e, TEXT) => {
+  // recognizer.addEventListener('result', ev => console.warn('Event: result.', ev));
+
+  recognizer.onresult = (ev) => {
+    const TEXT = ev._data.results[0][0].transcript;
+    const SOURCE = ev._source;
+
+    console.warn('Result event:', ev);
+
+    RESULT.textContent = TEXT; // Or: RESULT.value!
+    LOG.textContent += `Result := ${TEXT} (${SOURCE})\n`;
+
+    onRecognitionStart();
+  };
+
+  recognizer.onend = (ev) => {
+    console.warn('End event:', ev);
+    LOG.textContent += '> End.\n';
+  };
+
+  recognizer.onstart = ev => {
+    console.debug('Start event:', ev);
+    LOG.textContent += '> Start\n';
+  };
+
+  recognizer.onerror = ev => {
+    const ERROR = ev._data.error;
+
+    console.error('>> ERROR:', ERROR, ev);
+
+    onRecognitionStop();
+
+    document.body.classList.add('recognizer-error');
+    document.body.setAttribute('data-error', ERROR);
+
+    if (/microphone initialization: NotAllowedError/.test(ERROR)) {
+      LOG.textContent = '> Warning: microphone blocked.';
+    }
+  };
+
+  /* recognizer.recognizing((e, TEXT) => {
     RESULT.textContent = TEXT; // Or: RESULT.value!
     LOG.textContent += `Recognizing := ${TEXT}\n`;
 
@@ -73,7 +112,7 @@ export function exampleApp () {
     LOG.textContent += '>Session end.\n';
 
     onRecognitionStop();
-  });
+  }); */
 
   // ----------------------------------------------------
   // Button events.
@@ -84,7 +123,7 @@ export function exampleApp () {
 
     console.debug('Recognizer start button clicked');
 
-    recognizer.startRecognition(() => {});
+    recognizer.start();
 
     // setTimeout(() => enumMediaDevices(), 5000);
   });
@@ -94,13 +133,13 @@ export function exampleApp () {
 
     console.debug('Recognizer stop button clicked');
 
-    recognizer.stopRecognition(() => onRecognitionStop());
+    recognizer.stop(() => onRecognitionStop());
   });
 }
 
 // ----------------------------------------------------
 
-window.addEventListener(AUDIO_SOURCE_ERROR_EVENT, ev => {
+/* window.addEventListener(AUDIO_SOURCE_ERROR_EVENT, ev => {
   console.error('>>>> ERROR:', ev.detail.event.error, ev);
 
   onRecognitionStop();
@@ -111,7 +150,7 @@ window.addEventListener(AUDIO_SOURCE_ERROR_EVENT, ev => {
   if (ev.detail.micNotAllowed) {
     LOG.textContent = '> Warning: microphone blocked.';
   }
-});
+}); */
 
 function onButtonStart () {
   REC_START_BUTTON.disabled = true;

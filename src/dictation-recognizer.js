@@ -7,8 +7,16 @@
  * @see https://github.com/microsoft/cognitive-services-speech-sdk-js
  */
 
+// import { SpeechRecognitionBase } from './speech-recognition-base.js';
+
+// export const SRB = new SpeechRecognitionBase();
+
 const { SpeechConfig, AudioConfig, SpeechRecognizer, ResultReason, CancellationReason, OutputFormat } = window.SpeechSDK;
 const CustomEvent = window.CustomEvent;
+const Event = window.Event;
+const EventTarget = window.EventTarget;
+
+const CUSTOM_EVENT = '_custom';
 
 export const AUDIO_SOURCE_ERROR_EVENT = 'audioSourceError';
 
@@ -25,7 +33,7 @@ export class MyErrorEventListener /* implements IEventListener<PlatformEvent> */
       }
     } else {
       // Non-error, e.g. 'AudioStreamNodeAttachedEvent' etc.
-      console.debug('Event:', event);
+      // console.debug('Event:', event);
     }
   }
 }
@@ -50,14 +58,16 @@ export const DEFAULTS = {
 
 // ----------------------------------------------------
 
-export class DictationRecognizer {
+export class DictationRecognizer extends EventTarget { // SpeechRecognitionBase {
   constructor () {
+    super(...arguments);
+
     this.recognizer = null;
     this.OPT = {};
-    this.reset();
+    this._reset();
   }
 
-  reset () {
+  _reset () {
     this.lastOffset = null;
     this.interims = []; // Hypotheses.
     this.BUFFER = []; // Final text.
@@ -83,12 +93,20 @@ export class DictationRecognizer {
     }
 
     const audioConfig = AudioConfig.fromDefaultMicrophoneInput();
-    audioConfig.events.attachListener(new MyErrorEventListener());
+    audioConfig.events.attachListener(new MyErrorEventListener()); // TODO: 'this' does NOT work ?!
 
     const recognizer = new SpeechRecognizer(speechConfig, audioConfig);
 
     this.recognizer = recognizer;
     this.OPT = OPT;
+    this.lang = OPT.lang;
+
+    // ----
+
+    this.recognizing();
+    this.recognized();
+    this.sessionStopped();
+    this.canceled();
 
     console.debug(`${this.constructor.name}:`, this);
 
@@ -96,29 +114,21 @@ export class DictationRecognizer {
   }
 
   // Start continuous speech recognition
-  startRecognition (callbackFn = null) {
-    this.reset();
+  start () {
+    this._reset();
 
     this.recognizer.startContinuousRecognitionAsync(() => {
-      console.debug('Recognition started');
-
-      if (callbackFn) { callbackFn('Recognition started'); }
+      this._dispatchEvent('start');
     },
-    (err) => {
-      console.error('Recognition start error:', `[${typeof err || 'XX'}]`, err);
-    });
+    (error) => this._handleError(error, 'start'));
   }
 
   // Stop continuous speech recognition
-  stopRecognition (callbackFn = null) {
+  stop () {
     this.recognizer.stopContinuousRecognitionAsync(() => {
-      console.debug('Recognition stopped');
-
-      if (callbackFn) { callbackFn('Recognition stopped'); }
+      this._dispatchEvent('end'); // Not: 'stop' !!
     },
-    (err) => {
-      console.error('Recognition stop error:', err);
-    });
+    (error) => this._handleError(error, 'stop'));
   }
 
   recognizing (callbackFn = null) {
@@ -141,7 +151,9 @@ export class DictationRecognizer {
 
       this.lastOffset = e.result.offset;
 
-      if (callbackFn) { callbackFn(e, this.getInterimText()); }
+      if (callbackFn) { callbackFn(e, this.getInterimText()); } /** @Deprecated */
+
+      this._dispatchResultEvent(e, false, 'recognizing');
     };
   }
 
@@ -150,31 +162,33 @@ export class DictationRecognizer {
       const nReason = e.result.reason;
       const strReason = ResultReason[nReason] || 'Unknown';
       const res = JSON.parse(e.privResult.privJson);
+      const source = `recognized.${strReason}.${res.RecognitionStatus}`;
 
       const STATUS_REGEX = new RegExp(this.OPT.stopStatusRegex);
 
       if (nReason === ResultReason.NoMatch && STATUS_REGEX.test(res.RecognitionStatus)) {
-        this.stopRecognition(); // WAS: recognizer.stopContinuousRecognitionAsync();
-      }
+        this.stop(); // WAS: recognizer.stopContinuousRecognitionAsync();
 
-      // We don't see 'RecognizedSpeech' in dictation mode!
-      if (nReason === ResultReason.RecognizedSpeech) {
+        this._dispatchResultEvent(e, true, source);
+
+        // We don't see 'RecognizedSpeech' in dictation mode!
+      } else if (nReason === ResultReason.RecognizedSpeech) {
         const TEXT = e.getResult().getText();
 
         console.warn('>> Recognized event. Reason:', strReason, TEXT, res.RecognitionStatus, res, e, s);
 
         this.BUFFER.push(TEXT);
 
-        if (callbackFn) { callbackFn(e, this.getRecognizedText()); }
+        this._dispatchResultEvent(e, true, source);
       } else {
         console.debug('Recognizer event. Reason:', strReason, res.RecognitionStatus, res, e, s);
 
-        if (callbackFn) { callbackFn(e, null, res.RecognitionStatus); }
+        this._dispatchEvent(CUSTOM_EVENT, null, e, source);
       }
     };
   }
 
-  canceled (callbackFn = null) {
+  canceled () {
     this.recognizer.canceled = (s, e) => {
       console.warn(`CANCELED: Reason=${e.reason}`);
 
@@ -182,21 +196,23 @@ export class DictationRecognizer {
         console.error(`"CANCELED: ErrorCode=${e.errorCode}`);
         console.warn(`"CANCELED: ErrorDetails=${e.errorDetails}`);
         console.warn('CANCELED: Did you update the subscription info?');
+
+        this._handleError(e, 'canceled');
+      } else {
+        this._dispatchEvent(CUSTOM_EVENT, null, e, 'canceled');
       }
 
-      this.stopRecognition(); // WAS: recognizer.stopContinuousRecognitionAsync();
-
-      if (callbackFn) { callbackFn(e); }
+      this.stop(); // WAS: recognizer.stopContinuousRecognitionAsync();
     };
   }
 
-  sessionStopped (callbackFn) {
+  sessionStopped () {
     this.recognizer.sessionStopped = (s, e) => {
-      this.stopRecognition(); // Was: recognizer.stopContinuousRecognitionAsync();
+      this.stop(); // Was: recognizer.stopContinuousRecognitionAsync();
 
       console.debug(`\n>> Session stopped event. Result: "${this.getRecognizedText()}"`, e, s);
 
-      if (callbackFn) { callbackFn(e, this.getRecognizedText()); }
+      this._dispatchResultEvent(e, true, 'sessionStopped');
     };
   }
 
@@ -207,4 +223,67 @@ export class DictationRecognizer {
   getRecognizedText () {
     return this.BUFFER.length ? this.BUFFER.join(this.OPT.separator) : this.getInterimText();
   }
+
+  // ----------------------------------------------------
+
+  _dispatchEvent (eventName, data = null, origEvent = null, source = null) {
+    const event = new Event(eventName);
+    if (data) { event._data = data; }
+    if (origEvent) { event._origEvent = origEvent; }
+    if (source) { event._source = source; }
+
+    this.dispatchEvent(event);
+
+    const onEvent = `on${eventName}`;
+    if (this[onEvent] && typeof this[onEvent] === 'function') {
+      this[onEvent](event);
+    }
+
+    console.debug('Recognition event fired:', eventName, event);
+  }
+
+  _dispatchResultEvent (origEvent, isFinal, source) {
+    const transcript = isFinal ? this.getRecognizedText() : this.getInterimText();
+
+    this._dispatchEvent('result', {
+      emma: null,
+      interpretation: null,
+      resultIndex: 0,
+      results: [[{ transcript, confidence: null }]],
+      _isFinal: isFinal
+    },
+    origEvent,
+    source);
+  }
+
+  _handleError (error, source) {
+    console.error('Recognition ERROR fired:', source, error);
+
+    this._dispatchEvent('error', { error }, null, source);
+  }
+
+  // ----------------------------------------------------
+
+  /* _onEvent (ev) {
+    if (ev.name.includes('Error')) {
+      // console.warn('ERROR:', ev.error, ev);
+
+      // 'AudioSourceErrorEvent'
+      if (ev.error.includes('microphone initialization: NotAllowedError')) {
+        // const EV = new CustomEvent(AUDIO_SOURCE_ERROR_EVENT, { detail: { event, micNotAllowed: true } });
+        // window.dispatchEvent(EV);
+
+        console.debug('onEvent:', this, ev);
+
+        this._handleError(ev, 'AudioSourceErrorEvent');
+      }
+    } else {
+      // Non-error, e.g. 'AudioStreamNodeAttachedEvent' etc.
+      // console.debug('Event:', event);
+    }
+  } */
 }
+
+/* DictationRecognizer.prototype.onEvent = (ev) => {
+  console.debug('onEvent (prototype):', this, ev);
+}; */
