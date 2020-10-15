@@ -4,10 +4,8 @@
  * @author NDF, 09-October-2020.
  */
 
-import {
-  DictationRecognizer /* DEFAULTS as DEF, AUDIO_SOURCE_ERROR_EVENT */
-} from './dictation-recognizer.js';
-
+import { getDictationRecognizerConfig } from './directline-config.js';
+import { DictationRecognizer, setDictationRecognizerConfig } from './dictation-recognizer.js';
 import { webApiSpeechRecogDemo } from './web-api-speech-recog.js';
 
 const USE_WEB_API = param(/webapi=(true)/);
@@ -22,6 +20,7 @@ const USE_WEB_API = param(/webapi=(true)/);
   audioLogging: param(/audioLogging=(enable|true)/i, false),
   format: param(/format=(simple|detailed)/, DEF.format),
   stopStatusRegex: DEF.stopStatusRegex,
+  normalize: true,
 
   separator: ' '
 }; */
@@ -42,6 +41,8 @@ if (USE_WEB_API) {
 }
 
 export function exampleApp () {
+  setDictationRecognizerConfig(getDictationRecognizerConfig());
+
   const recognizer = new DictationRecognizer();
 
   // Was: recognizer.initialize(OPT);
@@ -82,7 +83,7 @@ export function exampleApp () {
   };
 
   recognizer.onerror = ev => {
-    const ERROR = ev._data.error;
+    const ERROR = ev.data.error;
 
     console.error('>> ERROR:', ERROR, ev);
 
@@ -152,6 +153,8 @@ function onRecognitionStop () {
 
   document.body.classList.add('recognizer-stopped');
   document.body.classList.remove('recognizer-started');
+
+  console.warn('onRecognitionStop:', document.body, document.body.classList);
 }
 
 // ----------------------------------------------------

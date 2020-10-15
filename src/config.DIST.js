@@ -1,5 +1,5 @@
 /**
- * Microsoft speech service configuration.
+ * Microsoft speech service configuration (DEFAULTS.)
  *
  * 1. Copy and rename this file to: "directline-config.js" (!)
  * 2. Add your speech subscription key below.
@@ -19,7 +19,7 @@ export function getDictationRecognizerConfig () {
     endSilenceTimeoutMs: 5 * 1000,
     audioLogging: false,
     stopStatusRegex: '(NOT__EndOfDictation|InitialSilenceTimeout)',
-    normalize: true,
+    normalize: true, // Text normalization.
     separator: ' ' // A space.
   };
 }
