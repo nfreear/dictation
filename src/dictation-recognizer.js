@@ -7,12 +7,13 @@
  * @see https://github.com/microsoft/cognitive-services-speech-sdk-js
  */
 
+import { EventTarget } from './dictation/event-target-shim.js';
 // Was: import { getDictationRecognizerConfig } from './directline-config.js';
 
 const { SpeechConfig, AudioConfig, SpeechRecognizer, ResultReason, CancellationReason, OutputFormat } = window.SpeechSDK;
 
-const Event = window.Event;
-const EventTarget = window.EventTarget;
+// const Event = window.Event;
+// const EventTarget = window.EventTarget;
 // const SpeechRecognitionEvent = window.SpeechRecognitionEvent || window.webkitSpeechRecognitionEvent || Event;
 
 const CUSTOM_EVENT = '_custom';
@@ -22,9 +23,20 @@ export const SpeechGrammarList = window.SpeechGrammarList || window.webkitSpeech
 
 // ----------------------------------------------------
 
-export class SpeechRecognitionEventBase extends Event {
-  constructor (name, data = null) {
-    super(...arguments);
+/* class SpeechRecognitionEvent {
+  constructor(type, { data, emma, interpretation, resultIndex, results } = {}) {
+    this.data = data;
+    this.emma = emma; // (Obsolete.)
+    this.interpretation = interpretation; // (Obsolete.)
+    this.resultIndex = resultIndex;
+    this.results = results;
+    this.type = type;
+  }
+} */
+
+export class SpeechRecognitionEvent { // extends Event {
+  constructor (type, data = null) {
+    // super(...arguments);
 
     data = data || {};
 
@@ -32,11 +44,15 @@ export class SpeechRecognitionEventBase extends Event {
     this.interpretation = null; // Readonly; Obsolete.
     this.resultIndex = data.resultIndex || 0;
     this.results = data.results || null; // { length: 0 }; // SpeechRecognitionResultList.
+
+    this.type = type;
   }
 }
 
+const DEFAULT_CONFIDENCE = 0.951111;
+
 // https://github.com/compulim/web-speech-cognitive-services/blob/master/packages/component/src/SpeechServices/SpeechToText/cognitiveServiceEventResultToWebSpeechRecognitionResultList.js
-export function getWebSpeechRecognitionResultList (transcript, isFinal = true, confidence = 0.95) {
+export function getWebSpeechRecognitionResultList (transcript, isFinal = true, confidence = DEFAULT_CONFIDENCE) {
   const resultList = [
     [
       { confidence, transcript }
@@ -46,6 +62,20 @@ export function getWebSpeechRecognitionResultList (transcript, isFinal = true, c
   resultList.isFinal = isFinal;
 
   return resultList;
+}
+
+// @see https://github.com/compulim/web-speech-cognitive-services/blob/master/packages/component/src/SpeechServices/SpeechToText/createSpeechRecognitionPonyfill.js
+function serializeRecognitionResult({ duration, errorDetails, json, offset, properties, reason, resultId, text }) {
+  return {
+    duration,
+    errorDetails,
+    json: JSON.parse(json),
+    offset,
+    properties,
+    reason,
+    resultId,
+    text
+  };
 }
 
 // ----------------------------------------------------
@@ -69,7 +99,9 @@ export class DictationRecognizer extends EventTarget { // SpeechRecognitionBase 
 
     OPT = OPT || privRecogConfig;
 
-    // Web API compatibility.
+    if (!OPT) throw new Error(`Fail in DictationRecognizer constructor. No options: ${OPT}`);
+
+    // Web API compatibility (crude!)
     this.continuous = false;
     this.grammars = new SpeechGrammarList(); // {length: 0}
     this.interimResults = false;
@@ -85,6 +117,7 @@ export class DictationRecognizer extends EventTarget { // SpeechRecognitionBase 
 
   _reset () {
     this.started = false;
+    this.finalResultSent = false;
     this.lastOffset = null;
     this.interims = []; // Hypotheses.
     this.BUFFER = []; // Final text.
@@ -146,6 +179,11 @@ export class DictationRecognizer extends EventTarget { // SpeechRecognitionBase 
   stop () {
     if (this.started) {
       this.recognizer.stopContinuousRecognitionAsync(() => {
+        // Hack: just mock these events?
+        this._dispatchEvent('speechend', null, null, 'stop');
+        this._dispatchEvent('soundend');
+        this._dispatchEvent('audioend');
+
         this._dispatchEvent('end', null, null, 'stop'); // Event is not 'stop' !!
 
         this.started = false;
@@ -160,10 +198,24 @@ export class DictationRecognizer extends EventTarget { // SpeechRecognitionBase 
 
   // ----------------------------------------------------
   // Private lifecycle event handlers.
+  /*
+  17:02:34.125  ~~ Event: start
+  17:02:34.324  ~~ Event: audiostart
+  17:02:35.067  ~~ Event: soundstart
+  17:02:35.067  ~~ Event: speechstart
+  17:02:36.090  ~~ Event: speechend
+  17:02:36.090  ~~ Event: soundend
+  17:02:36.090  ~~ Event: audioend
+  17:02:36.264  ~~ Event: result
+  17:02:36.264  ~~ Event: end */
 
   sessionStarted () {
     this.recognizer.sessionStarted = (s, e) => {
       this._dispatchEvent('start', null, e, 'sessionStarted');
+
+      this._dispatchEvent('audiostart', null, null, 'sessionStarted');
+      this._dispatchEvent('soundstart');
+      this._dispatchEvent('speechstart');
 
       this.started = true;
     };
@@ -189,7 +241,7 @@ export class DictationRecognizer extends EventTarget { // SpeechRecognitionBase 
 
       this.lastOffset = e.result.offset;
 
-      this._dispatchResultEvent(e, false, 'recognizing');
+      // this._dispatchResultEvent(e, false, 'recognizing'); ??
     };
   }
 
@@ -203,10 +255,14 @@ export class DictationRecognizer extends EventTarget { // SpeechRecognitionBase 
       const STATUS_REGEX = new RegExp(this.OPT.stopStatusRegex);
 
       if (nReason === ResultReason.NoMatch && STATUS_REGEX.test(res.RecognitionStatus)) {
-        setTimeout(() => this.stop(), STOP_TIMEOUT_MS);
+        this.stop();
+        // setTimeout(() => this.stop(), STOP_TIMEOUT_MS);
         // WAS: recognizer.stopContinuousRecognitionAsync();
 
-        this._dispatchResultEvent(e, true, source);
+        if (!this.finalResultSent) {
+          this._dispatchResultEvent(e, true, source);
+          this.finalResult = true;
+        }
 
         // We don't see 'RecognizedSpeech' in dictation mode ?!
       } else if (nReason === ResultReason.RecognizedSpeech) {
@@ -216,7 +272,10 @@ export class DictationRecognizer extends EventTarget { // SpeechRecognitionBase 
 
         this.BUFFER.push(TEXT);
 
-        this._dispatchResultEvent(e, true, source);
+        if (!this.finalResultSent) {
+          this._dispatchResultEvent(e, true, source);
+          this.finalResult = true;
+        }
       } else {
         console.debug('Recognized event. Reason:', strReason, res.RecognitionStatus, res, e, s);
 
@@ -244,7 +303,8 @@ export class DictationRecognizer extends EventTarget { // SpeechRecognitionBase 
 
   sessionStopped () {
     this.recognizer.sessionStopped = (s, e) => {
-      setTimeout(() => this.stop(), STOP_TIMEOUT_MS); // Was: recognizer.stopContinuousRecognitionAsync();
+      this.stop();
+      // setTimeout(() => this.stop(), STOP_TIMEOUT_MS); // Was: recognizer.stopContinuousRecognitionAsync();
 
       console.debug(`\n>> Session stopped event. Result: "${this.getRecognizedText()}"`, e, s);
 
@@ -277,16 +337,19 @@ export class DictationRecognizer extends EventTarget { // SpeechRecognitionBase 
   // Event and error dispatchers.
 
   _dispatchEvent (eventName, data = null, recognizerEvent = null, source = null) {
-    const event = new SpeechRecognitionEventBase(eventName, data);
+    let event;
+
+    if (eventName === 'error') {
+      const { error } = data;
+      event = new ErrorEvent('error', { error, message: error && (error.stack || error.message), data });
+    } else {
+      event = new SpeechRecognitionEvent(eventName, data);
+    }
 
     if (recognizerEvent || source) {
       event.data = {
         recognizerEvent, source
       };
-    }
-
-    if (eventName === 'error') {
-      event.data = data;
     }
 
     this.dispatchEvent(event);
