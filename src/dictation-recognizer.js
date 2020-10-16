@@ -7,17 +7,21 @@
  * @see https://github.com/microsoft/cognitive-services-speech-sdk-js
  */
 
-import { EventTarget } from './dictation/event-target-shim.js';
+// import { BOT_DISPATCH_EVENT } from './bot-event.js';
+// import { EventTarget } from './dictation/event-target-shim.js';
 // Was: import { getDictationRecognizerConfig } from './directline-config.js';
 
 const { SpeechConfig, AudioConfig, SpeechRecognizer, ResultReason, CancellationReason, OutputFormat } = window.SpeechSDK;
 
-// const Event = window.Event;
-// const EventTarget = window.EventTarget;
+export const BOT_DISPATCH_EVENT = 'admins:botdispatch';
+
+const Event = window.Event;
+const EventTarget = window.EventTarget;
+const ErrorEvent = window.ErrorEvent;
 // const SpeechRecognitionEvent = window.SpeechRecognitionEvent || window.webkitSpeechRecognitionEvent || Event;
 
 const CUSTOM_EVENT = '_custom';
-const STOP_TIMEOUT_MS = 3000;
+// const STOP_TIMEOUT_MS = 3000;
 
 export const SpeechGrammarList = window.SpeechGrammarList || window.webkitSpeechGrammarList;
 
@@ -34,9 +38,9 @@ export const SpeechGrammarList = window.SpeechGrammarList || window.webkitSpeech
   }
 } */
 
-export class SpeechRecognitionEvent { // extends Event {
+export class SpeechRecognitionEvent extends Event { // Extend, or not??
   constructor (type, data = null) {
-    // super(...arguments);
+    super(...arguments);
 
     data = data || {};
 
@@ -45,7 +49,7 @@ export class SpeechRecognitionEvent { // extends Event {
     this.resultIndex = data.resultIndex || 0;
     this.results = data.results || null; // { length: 0 }; // SpeechRecognitionResultList.
 
-    this.type = type;
+    // this.type = type;
   }
 }
 
@@ -65,7 +69,7 @@ export function getWebSpeechRecognitionResultList (transcript, isFinal = true, c
 }
 
 // @see https://github.com/compulim/web-speech-cognitive-services/blob/master/packages/component/src/SpeechServices/SpeechToText/createSpeechRecognitionPonyfill.js
-function serializeRecognitionResult({ duration, errorDetails, json, offset, properties, reason, resultId, text }) {
+export function serializeRecognitionResult ({ duration, errorDetails, json, offset, properties, reason, resultId, text }) {
   return {
     duration,
     errorDetails,
@@ -87,10 +91,13 @@ function serializeRecognitionResult({ duration, errorDetails, json, offset, prop
 // ----------------------------------------------------
 
 let privRecogConfig = null;
+let privDispatcher = null;
 
 // Call me before instantiating the
-export function setDictationRecognizerConfig (OPT) {
+export function setDictationRecognizerConfig (OPT, dispatcher) {
   privRecogConfig = OPT;
+  privDispatcher = dispatcher;
+  console.debug('setDictationRecognizerConfig, delayed?', OPT, dispatcher);
 }
 
 export class DictationRecognizer extends EventTarget { // SpeechRecognitionBase {
@@ -158,7 +165,7 @@ export class DictationRecognizer extends EventTarget { // SpeechRecognitionBase 
     this.sessionStopped();
     this.canceled();
 
-    console.debug(`${this.constructor.name}:`, this);
+    console.debug(`${this.constructor.name}:`, this, privDispatcher);
 
     return OPT;
   }
@@ -241,7 +248,7 @@ export class DictationRecognizer extends EventTarget { // SpeechRecognitionBase 
 
       this.lastOffset = e.result.offset;
 
-      // this._dispatchResultEvent(e, false, 'recognizing'); ??
+      this._dispatchResultEvent(e, false, 'recognizing'); // Dispatch, or not ??
     };
   }
 
@@ -259,10 +266,10 @@ export class DictationRecognizer extends EventTarget { // SpeechRecognitionBase 
         // setTimeout(() => this.stop(), STOP_TIMEOUT_MS);
         // WAS: recognizer.stopContinuousRecognitionAsync();
 
-        if (!this.finalResultSent) {
-          this._dispatchResultEvent(e, true, source);
-          this.finalResult = true;
-        }
+        // if (!this.finalResultSent) {
+        this._dispatchResultEvent(e, true, source);
+        this.finalResult = true;
+        // }
 
         // We don't see 'RecognizedSpeech' in dictation mode ?!
       } else if (nReason === ResultReason.RecognizedSpeech) {
@@ -369,7 +376,71 @@ export class DictationRecognizer extends EventTarget { // SpeechRecognitionBase 
       results: getWebSpeechRecognitionResultList(transcript, isFinal) // [[{ transcript, confidence: null }]],
     };
 
+    // this._stopDictate(isFinal);
+    // setTimeout(() =>
+    this._setSendBox(transcript, isFinal);
+    // , 10); // Was: 500
+    this._submitSendBox(transcript, isFinal);
+
     this._dispatchEvent('result', data, origEvent, source);
+  }
+
+  _stopDictate (isFinal) {
+    if (isFinal) {
+      const ACTION = {
+        type: 'WEB_CHAT/STOP_DICTATE'
+      };
+
+      const event = new Event(BOT_DISPATCH_EVENT);
+      event.data = ACTION;
+      window.dispatchEvent(event);
+
+      console.debug('DICT. stopDictate:', ACTION);
+    }
+  }
+
+  _setSendBox (transcript, isFinal) {
+    if (isFinal) {
+      const ACTION = {
+        type: 'WEB_CHAT/SET_SEND_BOX',
+        payload: { text: transcript }
+      };
+
+      const event = new Event(BOT_DISPATCH_EVENT);
+      event.data = ACTION;
+      window.dispatchEvent(event);
+
+      console.debug('DICT. setSendBox:', ACTION);
+    }
+  }
+
+  // https://github.com/microsoft/BotFramework-WebChat/blob/master/packages/core/src/actions/submitSendBox.js
+  // https://github.com/microsoft/BotFramework-WebChat/blob/v4.10.1/packages/component/src/Dictation.js#L54
+  _submitSendBox (transcript, isFinal, confidence = DEFAULT_CONFIDENCE) {
+    if (isFinal) { // privDispatche &&
+      const ACTION = {
+        type: 'WEB_CHAT/SUBMIT_SEND_BOX',
+        payload: {
+          method: 'speech',
+          channelData: {
+            speech: { alternatives: [{ confidence, transcript }] }
+          }
+        }
+      };
+
+      const event = new Event(BOT_DISPATCH_EVENT);
+      event.data = ACTION;
+      // setTimeout(() =>
+      window.dispatchEvent(event);
+      // , 500);
+
+      /* const $INPUT = document.querySelector('[ data-id="webchat-sendbox-input" ]');
+      if ($INPUT) { $INPUT.textContent = transcript; } */
+
+      console.warn('>> DICT. submitSendBox:', ACTION); // Was: , $INPUT)
+    } else {
+      console.debug('DICT. Not submitSendbox');
+    }
   }
 
   _handleError (error, source) {
