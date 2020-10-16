@@ -119,6 +119,7 @@ export class DictationRecognizer extends EventTarget { // SpeechRecognitionBase 
     this.lang = OPT.lang;
 
     // Setup lifecycle event handlers.
+    this.sessionStarted();
     this.recognizing();
     this.recognized();
     this.sessionStopped();
@@ -134,7 +135,7 @@ export class DictationRecognizer extends EventTarget { // SpeechRecognitionBase 
     this._reset();
 
     this.recognizer.startContinuousRecognitionAsync(() => {
-      this._dispatchEvent('start', null, null, 'start');
+      // Was: this._dispatchEvent('start', null, null, 'start');
 
       this.started = true;
     },
@@ -145,7 +146,7 @@ export class DictationRecognizer extends EventTarget { // SpeechRecognitionBase 
   stop () {
     if (this.started) {
       this.recognizer.stopContinuousRecognitionAsync(() => {
-        this._dispatchEvent('end', null, null, 'stop'); // Not: 'stop' !!
+        this._dispatchEvent('end', null, null, 'stop'); // Event is not 'stop' !!
 
         this.started = false;
       },
@@ -159,6 +160,14 @@ export class DictationRecognizer extends EventTarget { // SpeechRecognitionBase 
 
   // ----------------------------------------------------
   // Private lifecycle event handlers.
+
+  sessionStarted () {
+    this.recognizer.sessionStarted = (s, e) => {
+      this._dispatchEvent('start', null, e, 'sessionStarted');
+
+      this.started = true;
+    };
+  }
 
   recognizing (callbackFn = null) {
     this.recognizer.recognizing = (s, e) => { // 'Sender', 'Event'
@@ -199,7 +208,7 @@ export class DictationRecognizer extends EventTarget { // SpeechRecognitionBase 
 
         this._dispatchResultEvent(e, true, source);
 
-        // We don't see 'RecognizedSpeech' in dictation mode!
+        // We don't see 'RecognizedSpeech' in dictation mode ?!
       } else if (nReason === ResultReason.RecognizedSpeech) {
         const TEXT = e.getResult().getText();
 
