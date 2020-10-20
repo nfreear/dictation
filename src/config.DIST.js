@@ -10,7 +10,7 @@
 
 export function getDictationRecognizerConfig () {
   return {
-    key: '__EDIT_ME__', // << Add your subscription key <<
+    key: param(/[?&]key=(\w+)/, '__EDIT_ME__'), // << Add your subscription key <<
     region: 'westeurope',
     lang: 'en-GB',
     format: 'detailed', // Was: OutputFormat.Detailed,
@@ -22,4 +22,9 @@ export function getDictationRecognizerConfig () {
     normalize: true, // Text normalization.
     separator: ' ' // A space.
   };
+}
+
+function param (regex, def = null) {
+  const matches = window.location.href.match(regex);
+  return matches ? matches[1] : def;
 }

@@ -2,6 +2,8 @@
 
 # @ndf/speech-dictation-test
 
+__Work-in-progress!__
+
 Mastering '`endSilenceTimeoutMs`' in Microsoft Speech SDK dictation mode!
 
 _(08-Oct-2020)_

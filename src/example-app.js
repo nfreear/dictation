@@ -4,7 +4,8 @@
  * @author NDF, 09-October-2020.
  */
 
-import { getDictationRecognizerConfig } from './directline-config.js';
+import { getDictationRecognizerConfig } from './config.DIST.js';
+// Was: import { getDictationRecognizerConfig } from './directline-config.js';
 import { DictationRecognizer, setDictationRecognizerConfig } from './dictation-recognizer.js';
 import { webApiSpeechRecogDemo } from './web-api-speech-recog.js';
 
@@ -41,7 +42,15 @@ if (USE_WEB_API) {
 }
 
 export function exampleApp () {
-  setDictationRecognizerConfig(getDictationRecognizerConfig());
+  const options = getDictationRecognizerConfig();
+
+  if (!options.key || /_/.test(options.key)) {
+    document.body.className += 'error config-error';
+    LOG.textContent = 'ERROR: Expecting a URL parameter `?key=AZURE_SPEECH_SUBSCRIPTION_KEY`.';
+    throw new Error('ERROR: Expecting a URL parameter `?key=AZURE_SPEECH_SUBSCRIPTION_KEY`.');
+  }
+
+  setDictationRecognizerConfig(options);
 
   const recognizer = new DictationRecognizer();
 
