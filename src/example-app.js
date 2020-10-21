@@ -6,7 +6,8 @@
 
 import { getDictationRecognizerConfig } from './config.DIST.js';
 // Was: import { getDictationRecognizerConfig } from './directline-config.js';
-import { DictationRecognizer, setDictationRecognizerConfig } from './dictation-recognizer.js';
+// import { DictationRecognizer, setDictationRecognizerConfig } from './dictation-recognizer.js';
+import { SpeechRecognition, setDictationRecognizerConfig } from './dictation-recognizer.js';
 import { webApiSpeechRecogDemo } from './web-api-speech-recog.js';
 
 const USE_WEB_API = param(/webapi=(true)/);
@@ -52,7 +53,8 @@ export function exampleApp () {
 
   setDictationRecognizerConfig(options);
 
-  const recognizer = new DictationRecognizer();
+  const recognizer = new SpeechRecognition();
+  // const recognizer = new DictationRecognizer();
 
   // Was: recognizer.initialize(OPT);
   const OPT = recognizer.getConfiguration();
