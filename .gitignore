@@ -1,4 +1,5 @@
 
+.DS_Store
 external
 node_modules
 SpeechSDK-Javascript*
@@ -8,3 +9,4 @@ SpeechSDK-Javascript*
 
 *base.js
 test.html
+*.ts

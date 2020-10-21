@@ -71,7 +71,7 @@ export function getWebSpeechRecognitionResultList (transcript, isFinal = true, c
       { confidence, transcript }
     ]
   ];
-  // FIX :~ 'isFinal' hangs of the inner result!
+  // FIX :~ 'isFinal' hangs off the inner result!
   resultList[0].isFinal = isFinal;
 
   console.debug('resultList:', JSON.stringify(resultList, null, '\t'), resultList);
@@ -367,7 +367,7 @@ export class SpeechRecognition extends EventTarget {
   async _dispatchEvent (eventName, data = null, recognizerEvent = null, source = null) {
     let event;
 
-    console.debug('_dispatchEvent:', arguments);
+    // console.debug('_dispatchEvent:', arguments);
 
     if (eventName === 'error') {
       const { error } = data;
@@ -382,7 +382,7 @@ export class SpeechRecognition extends EventTarget {
       };
     }
 
-    console.debug('_dispatchEvent 2:', event);
+    // console.debug('_dispatchEvent 2:', event);
 
     try {
       this.dispatchEvent(event);
@@ -423,7 +423,8 @@ export class SpeechRecognition extends EventTarget {
     }
   }
 
-  _stopDictate (isFinal) {
+  // NOT used!
+  /* _stopDictate (isFinal) {
     if (isFinal) {
       const ACTION = {
         type: 'WEB_CHAT/STOP_DICTATE'
@@ -473,13 +474,13 @@ export class SpeechRecognition extends EventTarget {
       // , 500);
 
       /* const $INPUT = document.querySelector('[ data-id="webchat-sendbox-input" ]');
-      if ($INPUT) { $INPUT.textContent = transcript; } */
+      if ($INPUT) { $INPUT.textContent = transcript; } *-/
 
       console.warn('>> DICT. submitSendBox:', ACTION); // Was: , $INPUT)
     } else {
       console.debug('DICT. Not submitSendbox');
     }
-  }
+  } */
 
   _handleError (error, source) {
     console.error('Recognition ERROR fired:', source, error);
