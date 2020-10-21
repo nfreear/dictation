@@ -6,8 +6,8 @@
 
 import { getDictationRecognizerConfig } from './config.DIST.js';
 // Was: import { getDictationRecognizerConfig } from './directline-config.js';
-// import { DictationRecognizer, setDictationRecognizerConfig } from './dictation-recognizer.js';
-import { SpeechRecognition, setDictationRecognizerConfig } from './dictation-recognizer.js';
+import { createDictationRecognizerPonyfill } from './createDictationRecognizerPonyfill.js';
+// import { SpeechRecognition, setDictationRecognizerConfig } from './dictation-recognizer.js';
 import { webApiSpeechRecogDemo } from './web-api-speech-recog.js';
 
 const USE_WEB_API = param(/webapi=(true)/);
@@ -51,15 +51,20 @@ export function exampleApp () {
     throw new Error('ERROR: Expecting a URL parameter `?key=AZURE_SPEECH_SUBSCRIPTION_KEY`.');
   }
 
-  setDictationRecognizerConfig(options);
+  const ponyfill = createDictationRecognizerPonyfill(options);
 
-  const recognizer = new SpeechRecognition();
+  const recognizer = new ponyfill.SpeechRecognition();
+
+  // setDictationRecognizerConfig(options);
+  // const recognizer = new SpeechRecognition();
   // const recognizer = new DictationRecognizer();
 
   // Was: recognizer.initialize(OPT);
-  const OPT = recognizer.getConfiguration();
+  // const OPT = ponyfill.getConfiguration();
 
-  PRE_OPT.textContent = 'Options: ' + JSON.stringify(OPT, null, 2); // Was: '\t'
+  recognizer.getConfiguration().then(OPT => {
+    PRE_OPT.textContent = 'Options: ' + JSON.stringify(OPT, null, 2); // Was: '\t';
+  });
 
   // recognizer.addEventListener('result', ev => console.warn('Event: result.', ev));
 
