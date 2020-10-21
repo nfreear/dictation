@@ -136,10 +136,12 @@ function createSpeechRecognitionFromRecognizer (createRecognizer, options) {
       PRIV.getRecognizedText = () => {
         const TEXT = PRIV.BUFFER.length ? PRIV.BUFFER.join(PRIV.OPT.separator) : PRIV.getInterimText();
 
-        const result = this._config.normalize ? toSentence(TEXT) : TEXT;
+        const result = PRIV.OPT.normalize ? toSentence(TEXT) : TEXT;
 
         return result === '.' ? '' : result;
       };
+
+      PRIV.hasText = () => !!PRIV.getRecognizedText();
     }
 
     /** 'this.priv.initialize()' is defined inside 'getConfiguration' !
@@ -157,9 +159,6 @@ function createSpeechRecognitionFromRecognizer (createRecognizer, options) {
 
             console.debug(this.constructor.name, '(DICT). Initialize:', this);
           }
-          /* this.priv.OPT = OPT;
-          this.priv.recognizer = recognizer;
-          // this.priv.reset(); */
 
           resolve(PRIV.OPT);
 
@@ -218,7 +217,7 @@ function createSpeechRecognitionFromRecognizer (createRecognizer, options) {
     }
 
     abort () {
-      console.warn('Not implemented: \'abort()\'');
+      console.error('Not implemented: \'abort()\'');
     }
 
     start () {
@@ -248,14 +247,9 @@ function createSpeechRecognitionFromRecognizer (createRecognizer, options) {
     // ------------------------------------------------------------------
 
     async _startOnce () {
+      // TODO: [P2] Should check if recognition is active, we should not start recognition twice
       const recognizer = await this.priv.initialize();
 
-      /* if (!this.priv.recognizer) {
-        // TODO: [P2] Should check if recognition is active, we should not start recognition twice
-        const { recognizer, OPT } = await createRecognizer(options);
-
-        this.priv.initialize(recognizer, OPT);
-      } */
       this.priv.reset();
 
       try {
@@ -292,19 +286,20 @@ function createSpeechRecognitionFromRecognizer (createRecognizer, options) {
           if (nReason === ResultReason.NoMatch && hasStopStatus) {
             this.stop();
 
-            if (!PRIV.finalResultSent && TEXT) {
+            if (!PRIV.finalResultSent && PRIV.hasText()) {
               this._dispatchResultEvent(recEvent, true, source);
               PRIV.finalResultSent = true;
             }
+          } else if (nReason === ResultReason.NoMatch) {
+            this._dispatchResultEvent(recEvent, false, source);
 
             // We don't see 'RecognizedSpeech' in dictation mode ?!
           } else if (nReason === ResultReason.RecognizedSpeech) {
-            // console.debug('Recognized event. Reason:', strReason, TEXT, recogStatus, RES);
-
             PRIV.BUFFER.push(TEXT);
 
-            /** @NOTE We purposefully "downgrade" a 'recognized' result to an interim result !!
-            */
+            /** @NOTE We're waiting for "timeouts", so we purposefully
+             * "downgrade" a 'success' result to an interim result !!
+             */
             this._dispatchResultEvent(recEvent, false, source);
 
             /* if (!PRIV.finalResultSent) {
@@ -312,8 +307,6 @@ function createSpeechRecognitionFromRecognizer (createRecognizer, options) {
               PRIV.finalResultSent = true;
             */
           } else {
-            // console.debug('Recognized event. Reason:', strReason, recogStatus, RES);
-
             this._dispatchEvent(CUSTOM_EVENT, null, recEvent, source);
           }
         }; // End: recognized => {}.

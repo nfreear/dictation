@@ -57,10 +57,6 @@ export function exampleApp () {
 
   // setDictationRecognizerConfig(options);
   // const recognizer = new SpeechRecognition();
-  // const recognizer = new DictationRecognizer();
-
-  // Was: recognizer.initialize(OPT);
-  // const OPT = ponyfill.getConfiguration();
 
   recognizer.getConfiguration().then(OPT => {
     PRE_OPT.textContent = 'Options: ' + JSON.stringify(OPT, null, 2); // Was: '\t';
@@ -69,9 +65,10 @@ export function exampleApp () {
   // recognizer.addEventListener('result', ev => console.warn('Event: result.', ev));
 
   recognizer.onresult = (ev) => {
-    const TEXT = ev.results[0][0].transcript;
+    const firstResult = ev.results[0];
+    const TEXT = firstResult[0].transcript;
     // Was: const TEXT = ev._data.results[0][0].transcript;
-    const isFinal = ev.results[0].isFinal;
+    const isFinal = firstResult.isFinal;
     const SOURCE = ev.data.source;
 
     console.warn('Result event:', ev);
