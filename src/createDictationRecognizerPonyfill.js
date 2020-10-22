@@ -1,15 +1,13 @@
 /**
- * Example of declaring a class INSIDE a function declaration!
+ * The definition of 'createDictationRecognizerPonyfill' function.
  *
- * Definition of function 'createDictationRecognizerPonyfill()'
- *
- * @author NDF, 17-Oct-2020.
+ * @author Nick Freear, 21-October-2020.
  *
  * @see https://wicg.github.io/speech-api/#speechreco-section
  * @see https://github.com/compulim/web-speech-cognitive-services/blob/master/packages/component/src/SpeechServices/SpeechToText/createSpeechRecognitionPonyfill.js
  */
 
-// import { AudioConfig, SpeechConfig, OutputFormat, ResultReason, SpeechRecognizer } from 'SpeechSDK'; // window.SpeechSdk;
+// import { AudioConfig, SpeechConfig, OutputFormat, ResultReason, SpeechRecognizer } from 'SpeechSDK';
 
 const {
   SpeechConfig, AudioConfig, SpeechRecognizer, ResultReason, CancellationReason, OutputFormat
@@ -20,9 +18,10 @@ const ErrorEvent = window.ErrorEvent;
 const EventTarget = window.EventTarget;
 
 const DUMMY_CONFIDENCE = 0.951111;
+
 const CUSTOM_EVENT = '_custom';
 
-export class SpeechGrammarList {} // window.SpeechGrammarList
+class SpeechGrammarList {} // Is this enough? (window.SpeechGrammarList)
 
 export class SpeechRecognitionEvent extends Event {
   constructor (type, data = null) {
@@ -110,23 +109,24 @@ function createSpeechRecognitionFromRecognizer (createRecognizer, options) {
       this._grammars = null; // new SpeechGrammarList();
       this._maxAlternatives = 1;
 
+      // Internal and private.
       const PRIV = this.priv = {
-        OPT: null,
-        recognizer: null,
+        OPT: null, // Plain object.
+        recognizer: null, // Class instance.
         // ..!
-        started: null,
-        finalResultSent: null,
-        lastOffset: null,
-        interims: null,
-        BUFFER: null
+        started: null, // Boolean.
+        finalResultSent: null, // Boolean.
+        lastOffset: null, // Integer.
+        interims: null, // Hypotheses array.
+        BUFFER: null // Final text array.
       };
 
       PRIV.reset = () => {
         PRIV.started = false;
         PRIV.finalResultSent = false;
         PRIV.lastOffset = null;
-        PRIV.interims = []; // Hypotheses.
-        PRIV.BUFFER = []; // Final text.
+        PRIV.interims = [];
+        PRIV.BUFFER = [];
 
         console.debug('PRIV.reset()', this);
       };
@@ -144,13 +144,13 @@ function createSpeechRecognitionFromRecognizer (createRecognizer, options) {
       PRIV.hasText = () => !!PRIV.getRecognizedText();
     }
 
-    /** 'this.priv.initialize()' is defined inside 'getConfiguration' !
+    /** 'this.priv.initializeOnce()' is defined inside 'getConfiguration' !
     */
     async getConfiguration () {
       const PRIV = this.priv;
 
       const promise = new Promise((resolve, reject) => {
-        PRIV.initialize = async () => {
+        PRIV.initializeOnce = async () => {
           if (!PRIV.recognizer) {
             const { recognizer, OPT } = await createRecognizer(options);
 
@@ -231,7 +231,7 @@ function createSpeechRecognitionFromRecognizer (createRecognizer, options) {
     stop () {
       if (this.priv.started) {
         this.priv.recognizer.stopContinuousRecognitionAsync(async () => {
-          // Hack: just mock these events?
+          // Hack: we just mock these events.
           this._dispatchEvent('speechend', null, null, 'stop');
           this._dispatchEvent('soundend');
           this._dispatchEvent('audioend');
@@ -248,7 +248,8 @@ function createSpeechRecognitionFromRecognizer (createRecognizer, options) {
 
     async _startOnce () {
       // TODO: [P2] Should check if recognition is active, we should not start recognition twice
-      const recognizer = await this.priv.initialize();
+
+      const recognizer = await this.priv.initializeOnce();
 
       this.priv.reset();
 
@@ -293,7 +294,7 @@ function createSpeechRecognitionFromRecognizer (createRecognizer, options) {
           } else if (nReason === ResultReason.NoMatch) {
             this._dispatchResultEvent(recEvent, false, source);
 
-            // We don't see 'RecognizedSpeech' in dictation mode ?!
+            // We don't see 'RecognizedSpeech' in dictation mode, or do we?!
           } else if (nReason === ResultReason.RecognizedSpeech) {
             PRIV.BUFFER.push(TEXT);
 
@@ -337,10 +338,11 @@ function createSpeechRecognitionFromRecognizer (createRecognizer, options) {
           this._dispatchResultEvent(recEvent, false, 'recognizing');
         }; // End: recognizing => {}
 
-        recognizer.sessionStarted = (_s, { sessionId }) => {
-          this._dispatchEvent('start', null, { sessionId }, 'sessionStarted');
+        // { sessionId }
+        recognizer.sessionStarted = (_s, recEvent) => {
+          this._dispatchEvent('start', null, recEvent, 'sessionStarted');
 
-          this._dispatchEvent('audiostart', null, null, 'sessionStarted');
+          this._dispatchEvent('audiostart', null, recEvent, 'sessionStarted');
           this._dispatchEvent('soundstart');
           this._dispatchEvent('speechstart');
 
@@ -475,6 +477,8 @@ function createCognitiveRecognizer (options) {
 
   const recognizer = new SpeechRecognizer(speechConfig, audioConfig);
 
+  // const json = recognizer.internalData.agentConfig.toJsonString();
+
   console.debug('createCognitiveRecognizer:', OPT, recognizer);
 
   return { recognizer, OPT };
@@ -483,13 +487,14 @@ function createCognitiveRecognizer (options) {
 // ------------------------------------------------------------------
 
 export function createDictationRecognizerPonyfill (options) {
-  // const recognizer = createCognitiveRecognizer(options);
+  // WAS: const recognizer = createCognitiveRecognizer(options);
 
   const SpeechRecognition = createSpeechRecognitionFromRecognizer(createCognitiveRecognizer, options);
 
   return {
     SpeechGrammarList,
-    SpeechRecognition
+    SpeechRecognition,
+    SpeechRecognitionEvent
     // getConfiguration: () => _OPT
   };
 }

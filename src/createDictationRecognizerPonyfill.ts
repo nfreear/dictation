@@ -1,9 +1,9 @@
 /**
- * Example of declaring a class INSIDE a function declaration!
+ * DESIGN. Example of declaring a class INSIDE a function declaration!
  *
  * Definition of function 'createDictationRecognizerPonyfill()'
  *
- * @author NDF, 17-Oct-2020.
+ * @author Nick Freear, 17-Oct-2020.
  *
  * @see https://wicg.github.io/speech-api/#speechreco-section
  * @see https://github.com/compulim/web-speech-cognitive-services/blob/master/packages/component/src/SpeechServices/SpeechToText/createSpeechRecognitionPonyfill.js

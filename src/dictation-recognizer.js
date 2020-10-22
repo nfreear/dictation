@@ -1,4 +1,6 @@
 /**
+ * @DEPRECATED
+ *
  * Speech / `DictationRecognizer` class.
  *
  * @author NDF, 09-October-2020.

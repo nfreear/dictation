@@ -36,6 +36,8 @@ const LOG = document.querySelector('#log');
 const RESULT = document.querySelector('#result');
 const PRE_OPT = document.querySelector('#options');
 
+console.debug('SpeechSDK:', window.SpeechSDK);
+
 if (USE_WEB_API) {
   webApiSpeechRecogDemo();
 } else {
@@ -54,6 +56,8 @@ export function exampleApp () {
   const ponyfill = createDictationRecognizerPonyfill(options);
 
   const recognizer = new ponyfill.SpeechRecognition();
+
+  console.debug('Ponyfill:', ponyfill);
 
   // setDictationRecognizerConfig(options);
   // const recognizer = new SpeechRecognition();
