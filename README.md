@@ -4,7 +4,10 @@
 
 __Work-in-progress!__
 
-Mastering '`endSilenceTimeoutMs`' in Microsoft [Speech SDK][sdk] dictation mode!
+A dictation-mode speech recognizer _ponyfill_ compatible with [WebChat][]
+that gives the user time to pause.
+
+> Mastering '`endSilenceTimeoutMs`' in Microsoft [Speech SDK][sdk] dictation mode!
 
 _(08-Oct-2020)_
 
@@ -69,7 +72,8 @@ npm test
 [b-131]: https://github.com/Azure-Samples/cognitive-services-speech-sdk/issues/131
 [b-3466]: https://github.com/microsoft/BotFramework-WebChat/issues/3466
 [sdk]: https://github.com/microsoft/cognitive-services-speech-sdk-js
-[bot-speech]: https://github.com/microsoft/BotFramework-WebChat/blob/master/docs/SPEECH.md#integrating-web-chat-into-your-page
+[webchat]: https://github.com/Microsoft/BotFramework-WebChat
+[bot-speech]: https://github.com/Microsoft/BotFramework-WebChat/blob/master/docs/SPEECH.md#integrating-web-chat-into-your-page
 
 [comp-speech]: https://github.com/compulim/web-speech-cognitive-services
 [comp-ponyfill]: https://github.com/compulim/web-speech-cognitive-services/blob/master/packages/component/src/SpeechServices/SpeechToText/createSpeechRecognitionPonyfill.js

@@ -1,31 +1,15 @@
 /**
- * A demo application of the `DictationRecognizer`.
+ * A demo application of the dictation-mode speech recognizer.
  *
  * @author NDF, 09-October-2020.
  */
 
-import { getDictationRecognizerConfig } from './config.DIST.js';
-// Was: import { getDictationRecognizerConfig } from './directline-config.js';
-import { createDictationRecognizerPonyfill } from './createDictationRecognizerPonyfill.js';
-// import { SpeechRecognition, setDictationRecognizerConfig } from './dictation-recognizer.js';
+import { createDictationRecognizerPonyfill, getDictationRecognizerConfig } from './index.js';
 import { webApiSpeechRecogDemo } from './web-api-speech-recog.js';
 
 const USE_WEB_API = param(/webapi=(true)/);
 
-/* const OPT = {
-  key: param(/[?&]key=(\w+)/, '__EDIT_ME__'),
-  region: param(/region=(\w+)/, 'westeurope'),
-  lang: param(/lang=([\w-]+)/, 'en-GB'),
-  mode: param(/mode=(conversation|dictation)/, DEF.mode),
-  initialSilenceTimeoutMs: param(/initialSilenceTimeoutMs=(\d+)/, 5 * 1000),
-  endSilenceTimeoutMs: param(/endSilenceTimeoutMs=(\d+)/, 5 * 1000),
-  audioLogging: param(/audioLogging=(enable|true)/i, false),
-  format: param(/format=(simple|detailed)/, DEF.format),
-  stopStatusRegex: DEF.stopStatusRegex,
-  normalize: true,
-
-  separator: ' '
-}; */
+/* const OPT = { }; */
 
 const REC_START_BUTTON = document.querySelector('#recognizer-start-button');
 const REC_STOP_BUTTON = document.querySelector('#recognizer-stop-button');
