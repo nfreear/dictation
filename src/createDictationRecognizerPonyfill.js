@@ -1,7 +1,8 @@
 /**
- * The definition of 'createDictationRecognizerPonyfill' function.
+ * The definition of the 'createDictationRecognizerPonyfill' function.
  *
  * @author Nick Freear, 21-October-2020.
+ * @source https://github.com/nfreear/dictation
  *
  * @see https://wicg.github.io/speech-api/#speechreco-section
  * @see https://github.com/compulim/web-speech-cognitive-services/blob/master/packages/component/src/SpeechServices/SpeechToText/createSpeechRecognitionPonyfill.js
@@ -142,6 +143,9 @@ function createSpeechRecognitionFromRecognizer (createRecognizer, options) {
       };
 
       PRIV.hasText = () => !!PRIV.getRecognizedText();
+
+      // Need this call, so that 'priv.initializeOnce()' exists!
+      this.getConfiguration();
     }
 
     /** 'this.priv.initializeOnce()' is defined inside 'getConfiguration' !
