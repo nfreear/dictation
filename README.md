@@ -5,7 +5,7 @@
 __Work-in-progress!__
 
 A dictation-mode speech recognizer _ponyfill_ compatible with [WebChat][]
-that gives the user time to pause.
+that gives the user time to think!
 
 > Mastering '`endSilenceTimeoutMs`' in Microsoft [Speech SDK][sdk] dictation mode!
 
@@ -37,6 +37,9 @@ The key lines in `createDictationRecognizerPonyfill` to force dictation mode,
 and enable the setting of `initialSilenceTimeoutMs` and `endSilenceTimeoutMs`:
 
 ```javascript
+const initialSilenceTimeoutMs = 5 * 1000;
+const endSilenceTimeoutMs = 5 * 1000;
+// Scroll to right!
 const url = `wss://${region}.stt.speech.microsoft.com/speech/recognition/dictation/cognitiveservices/v1?initialSilenceTimeoutMs=${initialSilenceTimeoutMs || ''}&endSilenceTimeoutMs=${endSilenceTimeoutMs}&`;
 const urlObj = new URL(url);
 

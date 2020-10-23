@@ -1,5 +1,8 @@
 /**
- * The definition of the 'createDictationRecognizerPonyfill' function.
+ * A dictation-mode speech recognizer Ponyfill compatible with WebChat.js
+ * that gives the user time to think!
+ *
+ * Definition of the 'createDictationRecognizerPonyfill' function.
  *
  * @author Nick Freear, 21-October-2020.
  * @source https://github.com/nfreear/dictation
