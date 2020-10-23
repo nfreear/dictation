@@ -13,7 +13,7 @@
 // Refer to 'DEFAULTS' :~ ./src/createDictationRecognizerPonyfill.js#L42-L57
 export function getDictationRecognizerConfig () {
   return {
-    key: param(/[?&]key=(\w+)/, '__EDIT_ME__'), // << Add your subscription key <<
+    subscriptionKey: param(/[?&]key=(\w+)/, '__EDIT_ME__'), // << Add your subscription key <<
     region: param(/region=(\w+)/, 'westeurope'),
     lang: param(/lang=([\w-]+)/, 'en-GB')
     /*

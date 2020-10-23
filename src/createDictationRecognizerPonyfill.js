@@ -40,12 +40,12 @@ export class SpeechRecognitionEvent extends Event {
 }
 
 export const DEFAULTS = {
-  key: null, // Azure speech subscription key.
+  subscriptionKey: null, // Azure speech subscription key.
   region: 'westeurope',
   lang: 'en-US',
   mode: 'dictation',
-  initialSilenceTimeoutMs: 5 * 1000,
-  endSilenceTimeoutMs: 5 * 1000,
+  initialSilenceTimeoutMs: 6 * 1000,
+  endSilenceTimeoutMs: 3 * 1000,
   // audioLogging: false,
   format: 'detailed',
   stopStatusRegex: '(NOT__EndOfDictation|InitialSilenceTimeout)',
@@ -469,7 +469,7 @@ function createCognitiveRecognizer (options) {
   OPT.url = `wss://${OPT.region}.stt.speech.microsoft.com/speech/recognition/${OPT.mode}/cognitiveservices/v1?initialSilenceTimeoutMs=${OPT.initialSilenceTimeoutMs || ''}&endSilenceTimeoutMs=${OPT.endSilenceTimeoutMs || ''}&`;
   OPT.urlObj = new URL(OPT.url);
 
-  const speechConfig = SpeechConfig.fromEndpoint(OPT.urlObj, OPT.key);
+  const speechConfig = SpeechConfig.fromEndpoint(OPT.urlObj, OPT.subscriptionKey);
   // NOT: const speechConfig = SpeechConfig.fromSubscription(KEY, REGION);
 
   speechConfig.enableDictation();

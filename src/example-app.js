@@ -31,7 +31,7 @@ if (USE_WEB_API) {
 export function exampleApp () {
   const options = getDictationRecognizerConfig();
 
-  if (!options.key || /_/.test(options.key)) {
+  if (!options.subscriptionKey || /_/.test(options.subscriptionKey)) {
     document.body.className += 'error config-error';
     LOG.textContent = 'ERROR: Expecting a URL parameter `?key=AZURE_SPEECH_SUBSCRIPTION_KEY`.';
     throw new Error('ERROR: Expecting a URL parameter `?key=AZURE_SPEECH_SUBSCRIPTION_KEY`.');
