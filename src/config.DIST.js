@@ -1,7 +1,7 @@
 /**
  * Microsoft speech service configuration
  *
- * 1. Copy and rename this file to: "directline-config.js" (!)
+ * 1. Copy and rename this file to: "directline-config.js" (?!)
  * 2. Add your speech subscription key below.
  * 3. Edit the 'region' to match the subscription key.
  *
@@ -16,7 +16,7 @@ export function getDictationRecognizerConfig () {
     subscriptionKey: param(/[?&]key=(\w+)/, '__EDIT_ME__'), // << Add your subscription key <<
     region: param(/region=(\w+)/, 'westeurope'),
     lang: param(/lang=([\w-]+)/, 'en-GB'),
-    actionPhrasesEnable: !!param(/action(?:s)?=(1|true|enable)/, false),
+    actionPhrasesEnable: !!param(/action(?:s)?=(1|true|enable)/, false)
     /*
     format: 'detailed', // Was: OutputFormat.Detailed,
     mode: 'dictation',
