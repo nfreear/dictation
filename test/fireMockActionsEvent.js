@@ -1,7 +1,7 @@
 /**
- * Fire a mock event to add some "stop phrases".
+ * Fire a mock Chat-bot "activity" event to add some "stop phrases".
  *
- * @author NDF, 25-October-2020.
+ * @author Nick Freear, 25-October-2020.
  */
 
 const Event = window.Event;

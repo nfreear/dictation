@@ -51,7 +51,6 @@ export function exampleApp () {
 
     if (OPT.actionPhrasesEnable) {
       fireMockActionsEvent();
-      // setTimeout(() => fireMockActionsEvent(), 1000);
     }
   });
 

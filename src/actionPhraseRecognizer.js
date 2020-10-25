@@ -1,13 +1,14 @@
 /**
- * Enable a dictation-based speech recognizer to handle "action phrases" immediately.
+ * Tell a speech recognizer to return "stop" or "action" phrase results immediately.
  *
- * @author NDF, 23-October-2020.
+ * @author Nick Freear, 23-October-2020.
  */
 
 export class ActionPhraseRecognizer {
   constructor (incomingEventName, target = window) {
     this.eventName = incomingEventName;
     this.target = target;
+
     this._resetDictionary();
 
     this.target.addEventListener(this.eventName, ev => this._handleIncomingEvent(ev));
@@ -21,7 +22,7 @@ export class ActionPhraseRecognizer {
 
   addToDictionary (actionPhrases = []) {
     actionPhrases.forEach(action => {
-      this.stopPhraseDictionary.push(action.toLowerCase());
+      this.stopPhraseDictionary.push(this._normalizeText(action));
     });
 
     console.debug(this.constructor.name, 'Phrases added:', actionPhrases.length, this.stopPhraseDictionary);
@@ -35,14 +36,18 @@ export class ActionPhraseRecognizer {
     return boolFound;
   }
 
+  _normalizeText (text) {
+    return text.replace(/\.+$/, '').toLowerCase();
+  }
+
   _caseInsensitiveEqual (text) {
-    const phrase = text.replace(/\.+$/, '').toLowerCase();
+    const phrase = this._normalizeText(text);
 
     return this.stopPhraseDictionary.find(it => it === phrase);
   }
 
   _handleIncomingEvent (ev) {
-    // event.data = action.payload.activity;
+    // ( event.data = action.payload.activity )
     const activity = ev.data;
 
     console.debug(this.constructor.name, 'Incoming event:', activity, ev);
