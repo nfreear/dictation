@@ -4,7 +4,7 @@
  * @author NDF, 09-October-2020.
  */
 
-import { createDictationRecognizerPonyfill, getDictationRecognizerConfig } from './index.js';
+import { createDictationRecognizerPonyfill, getDictationRecognizerConfig, fireMockActionsEvent } from './index.js';
 import { webApiSpeechRecogDemo } from './web-api-speech-recog.js';
 
 const USE_WEB_API = param(/webapi=(true)/);
@@ -48,6 +48,11 @@ export function exampleApp () {
 
   recognizer.getConfiguration().then(OPT => {
     PRE_OPT.textContent = 'Options: ' + JSON.stringify(OPT, null, 2); // Was: '\t';
+
+    if (OPT.actionPhrasesEnable) {
+      fireMockActionsEvent();
+      // setTimeout(() => fireMockActionsEvent(), 1000);
+    }
   });
 
   // recognizer.addEventListener('result', ev => console.warn('Event: result.', ev));

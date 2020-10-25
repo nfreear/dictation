@@ -15,7 +15,8 @@ export function getDictationRecognizerConfig () {
   return {
     subscriptionKey: param(/[?&]key=(\w+)/, '__EDIT_ME__'), // << Add your subscription key <<
     region: param(/region=(\w+)/, 'westeurope'),
-    lang: param(/lang=([\w-]+)/, 'en-GB')
+    lang: param(/lang=([\w-]+)/, 'en-GB'),
+    actionPhrasesEnable: !!param(/action(?:s)?=(1|true|enable)/, false),
     /*
     format: 'detailed', // Was: OutputFormat.Detailed,
     mode: 'dictation',
