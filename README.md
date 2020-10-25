@@ -5,7 +5,7 @@
 __Work-in-progress!__
 
 A dictation-mode speech recognizer _ponyfill_ compatible with [WebChat][]
-that gives the user time to think!
+that gives the user time to think and stutter (_stammer_)!
 
 > Mastering '`endSilenceTimeoutMs`' in Microsoft [Speech SDK][sdk] dictation mode!
 
@@ -66,7 +66,7 @@ npm test
  * [Bug: '_Can i set silence duration at end of speech ?_' (#131)][b-131];
  * [Bug: '_... I need to lengthen the dictation / "Listening" timeout_' (#3466)][b-3466]
  * [GitHub: Microsoft/cognitive-services-speech-sdk-js][sdk];
- * [GitHub: @compulim/web-speech-cognitive-services `../create...Ponyfill.js`](comp-ponyfill);
+ * [GitHub: @compulim/web-speech-cognitive-services `../create...Ponyfill.js`][comp-ponyfill];
  * [GitHub: @compulim/react-dictate-button `../Composer.js`][dict-btn-recog];
 
 ---
