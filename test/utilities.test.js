@@ -1,5 +1,5 @@
 /**
- * 'Utilitiy' functions defined in `createDictationRecognizerPonyfill.js` !
+ * Test "utilitiy" functions defined in `createDictationRecognizerPonyfill.js` !
  *
  * @author NDF, 27-Nov-2020.
  */
