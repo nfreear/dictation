@@ -56,10 +56,11 @@ export function exampleApp () {
     const firstResult = ev.results[0];
     const TEXT = firstResult[0].transcript;
     // Was: const TEXT = ev._data.results[0][0].transcript;
+    const confidence = firstResult[0].confidence;
     const isFinal = firstResult.isFinal;
     const SOURCE = ev.data.source;
 
-    console.warn('Result event:', ev);
+    console.warn('Result event:', confidence, ev);
 
     RESULT.textContent = TEXT; // Or: RESULT.value!
     LOG.textContent += `Result := ${TEXT} (${SOURCE})\n`;

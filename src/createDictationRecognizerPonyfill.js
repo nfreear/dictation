@@ -56,11 +56,11 @@ export const DEFAULTS = {
   separator: ' ',
 
   url: null, // Derived!
-  urlObj: null
+  urlObj: null // Derived!
 };
 
-function serializeRecognitionResult ({ duration, errorDetails, json, offset, properties, reason, resultId, text }) {
-  return {
+function serializeRecognitionResult ({ duration, errorDetails, json, offset, properties, reason, resultId, displayText, text }) {
+  const RES = {
     duration,
     errorDetails,
     json: JSON.parse(json),
@@ -68,8 +68,15 @@ function serializeRecognitionResult ({ duration, errorDetails, json, offset, pro
     properties,
     reason,
     resultId,
-    text
+    displayText,
+    text,
+    _topText: null,
+    _confidence: null
   };
+
+  RES._confidence = RES.json.NBest ? RES.json.NBest[0].Confidence : null;
+
+  return RES;
 }
 
 // https://github.com/compulim/web-speech-cognitive-services/blob/master/packages/component/src/SpeechServices/SpeechToText/cognitiveServiceEventResultToWebSpeechRecognitionResultList.js
@@ -89,15 +96,15 @@ export function getWebSpeechRecognitionResultList (transcript, isFinal = true, c
 }
 
 // https://stackoverflow.com/questions/19089442/convert-string-to-sentence-case-in-javascript#
-function toSentence (text) {
+export function toSentence (text) {
   const sentence = text.replace(/^(\w)/, match => match.toUpperCase());
 
-  return `${sentence}.`;
+  return sentence.replace(/(\w)$/, match => `${match}.`); // Was: `${sentence}.`;
 }
 
 // ------------------------------------------------------------------
 
-function createSpeechRecognitionFromRecognizer (createRecognizer, options) {
+export function createSpeechRecognitionFromRecognizer (createRecognizer, options) {
   // ...
 
   class SpeechRecognition extends EventTarget {
@@ -122,7 +129,9 @@ function createSpeechRecognitionFromRecognizer (createRecognizer, options) {
         finalResultSent: null, // Boolean.
         lastOffset: null, // Integer.
         interims: null, // Hypotheses array.
-        BUFFER: null // Final text array.
+        BUFFER: null, // Final text array.
+        confidences: null, // Array of confidence numbers, for the final text (Range: 0.001-0.999).
+        details: null // Array of recognized event results (NBest, etc).
       };
 
       PRIV.reset = () => {
@@ -131,6 +140,8 @@ function createSpeechRecognitionFromRecognizer (createRecognizer, options) {
         PRIV.lastOffset = null;
         PRIV.interims = [];
         PRIV.BUFFER = [];
+        PRIV.confidences = [];
+        PRIV.details = [];
 
         console.debug('PRIV.reset()', this);
       };
@@ -147,7 +158,16 @@ function createSpeechRecognitionFromRecognizer (createRecognizer, options) {
 
       PRIV.hasText = () => !!PRIV.getRecognizedText();
 
-      // Need this call, so that 'priv.initializeOnce()' exists!
+      PRIV.getMeanConfidence = () => {
+        const sum = PRIV.confidences.length ? PRIV.confidences.reduce((acc, cur) => acc + cur) : null;
+        const avConfidence = PRIV.confidences.length ? sum / PRIV.confidences.length : null;
+
+        console.debug('>> Mean confidence:', avConfidence, PRIV.confidences);
+
+        return avConfidence || DUMMY_CONFIDENCE;
+      };
+
+      // We need this call, so that 'priv.initializeOnce()' exists!
       this.getConfiguration();
     }
 
@@ -278,8 +298,9 @@ function createSpeechRecognitionFromRecognizer (createRecognizer, options) {
         recognizer.recognized = (_s, recEvent) => {
           const PRIV = this.priv;
           const { result } = recEvent;
-          const TEXT = result.text || '<>';
+          const TEXT = result.displayText || result.text || ''; // Was: '<>'
           const RES = serializeRecognitionResult(result);
+          const NBEST = RES.json.NBest || null;
           const nReason = result.reason;
           const strReason = ResultReason[result.reason] || 'Unknown';
           // const res = JSON.parse(e.privResult.privJson);
@@ -289,7 +310,7 @@ function createSpeechRecognitionFromRecognizer (createRecognizer, options) {
           const STATUS_REGEX = new RegExp(PRIV.OPT.stopStatusRegex);
           const hasStopStatus = STATUS_REGEX.test(recogStatus);
 
-          console.debug(`Recognized event. Status: ${source}, "${TEXT}"`, hasStopStatus, RES);
+          console.debug(`Recognized event. Status: ${source}, "${TEXT}"`, RES._confidence, hasStopStatus, NBEST, RES);
 
           if (nReason === ResultReason.NoMatch && hasStopStatus) {
             this.stop();
@@ -304,6 +325,8 @@ function createSpeechRecognitionFromRecognizer (createRecognizer, options) {
             // We don't see 'RecognizedSpeech' in dictation mode, or do we?!
           } else if (nReason === ResultReason.RecognizedSpeech) {
             PRIV.BUFFER.push(TEXT);
+            PRIV.confidences.push(RES._confidence);
+            PRIV.details.push(RES.json);
 
             /** @NOTE We're waiting for "timeouts", so we purposefully
              * "downgrade" a 'success' result to an interim result !!
@@ -448,9 +471,10 @@ function createSpeechRecognitionFromRecognizer (createRecognizer, options) {
       console.debug('_dispatchResultEvent:', origEvent, isFinal, source);
 
       const transcript = isFinal ? PRIV.getRecognizedText() : PRIV.getInterimText();
+      const confidence = PRIV.getMeanConfidence();
       const data = {
         resultIndex: 0,
-        results: getWebSpeechRecognitionResultList(transcript, isFinal) // [[{ transcript, confidence: null }]],
+        results: getWebSpeechRecognitionResultList(transcript, isFinal, confidence) // [[{ transcript, confidence: null }]],
       };
 
       console.debug('_dispatchResultEvent (2):', origEvent, data, source);
