@@ -19,6 +19,7 @@ const SDK_SCRIPT = document.querySelector('script[ src *= ".speech.sdk." ]');
 const LOG = document.querySelector('#log');
 const RESULT = document.querySelector('#result');
 const PRE_OPT = document.querySelector('#options');
+const ACTIONS = document.querySelector('#actions');
 
 console.debug('SpeechSDK:', window.SpeechSDK);
 
@@ -43,14 +44,13 @@ export function exampleApp () {
 
   console.debug('Ponyfill:', ponyfill);
 
-  // setDictationRecognizerConfig(options);
-  // const recognizer = new SpeechRecognition();
-
   recognizer.getConfiguration().then(OPT => {
     PRE_OPT.textContent = 'Options: ' + JSON.stringify(OPT, null, 2); // Was: '\t';
 
     if (OPT.actionPhrasesEnable) {
-      fireMockActionsEvent();
+      const actionList = fireMockActionsEvent();
+
+      ACTIONS.innerHTML = `Suggested actions: <q>${actionList.join('</q>, <q>')}</q>`;
     }
   });
 

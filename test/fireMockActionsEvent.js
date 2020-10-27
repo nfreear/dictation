@@ -64,5 +64,9 @@ export function fireMockActionsEvent () {
   event.data = MOCK_ACTIVITY.payload.activity;
   window.dispatchEvent(event);
 
+  const ACTIONS = MOCK_ACTIVITY.payload.activity.suggestedActions.actions.map(act => act.title);
+
   console.debug('dispatchEvent:', event);
+
+  return ACTIONS;
 }
