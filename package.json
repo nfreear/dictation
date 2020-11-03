@@ -21,7 +21,7 @@
   "peerDependencies": {
     "botframework-webchat-root": "^4.10.1",
     "microsoft-cognitiveservices-speech-sdk": "^1.13.1",
-    "speech-sdk-cdn": "https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@latest/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js",
+    "speech-sdk-cdn": "https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@1.13.1/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js",
     "react-dictate-button": "^1.2.2"
   },
   "semistandard": {
