@@ -181,8 +181,12 @@ export function createSpeechRecognitionFromRecognizer (createRecognizer, options
           if (!PRIV.recognizer) {
             const { recognizer, OPT } = await createRecognizer(options);
 
+            const ctx = recognizer.privReco.privRecognizerConfig.privSpeechServiceConfig.context;
+
             PRIV.OPT = OPT;
             PRIV.recognizer = recognizer;
+            PRIV.sdkVersion = ctx.system.version;
+            PRIV.OPT.sdkVersion = ctx.system.version;
 
             console.debug(this.constructor.name, '(DICT). Initialize:', this);
           }
@@ -257,6 +261,7 @@ export function createSpeechRecognitionFromRecognizer (createRecognizer, options
     // Stop continuous speech recognition.
     stop () {
       if (this.priv.started) {
+        this.priv.started = false;
         this.priv.recognizer.stopContinuousRecognitionAsync(async () => {
           // Hack: we just mock these events.
           this._dispatchEvent('speechend', null, null, 'stop');
@@ -265,7 +270,7 @@ export function createSpeechRecognitionFromRecognizer (createRecognizer, options
 
           this._dispatchEvent('end', null, null, 'stop'); // Event is not 'stop' !!
 
-          this.priv.started = false;
+          // WAS: this.priv.started = false;
         },
         (error) => this._dispatchEvent('error', { error }, 'stop'));
       }
@@ -298,8 +303,9 @@ export function createSpeechRecognitionFromRecognizer (createRecognizer, options
         recognizer.recognized = (_s, recEvent) => {
           const PRIV = this.priv;
           const { result } = recEvent;
-          const TEXT = result.displayText || result.text || ''; // Was: '<>'
+          // WAS: const TEXT = result.displayText || result.text || ''; // Was: '<>'
           const RES = serializeRecognitionResult(result);
+          const TEXT = RES.json.DisplayText || RES.text || '';
           const NBEST = RES.json.NBest || null;
           const nReason = result.reason;
           const strReason = ResultReason[result.reason] || 'Unknown';
