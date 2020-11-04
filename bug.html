@@ -1,0 +1,43 @@
+<!doctype html><html lang="en-GB"> <title> *Dictation test </title>
+
+<meta name="robots" content="noindex,nofollow" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.3/gh-fork-ribbon.min.css" />
+<link rel="stylesheet" href="src/style.css" />
+<link rel="icon" href="data:," /><!-- Prevent favicon 404s! -->
+
+
+<h1> Dictation test (with BUG) </h1>
+
+<p id="sdk-version"></p>
+
+<p>
+  <button id="recognizer-start-button">Start dictation</button>
+  <button id="recognizer-stop-button" disabled >Stop</button>
+  <i id="recognizer-status" title="Recognizer stopped"></i>
+</p>
+
+
+<p>
+  <label for="result">Result</label>
+  <textarea id="result" class="output" placeholder="(No result)" rows="2" readonly ></textarea>
+</p>
+
+<pre id="log">--
+</pre>
+
+<pre id="options"></pre>
+
+
+<a class="github-fork-ribbon" href="https://github.com/nfreear/dictation" data-ribbon="Fork me on GitHub" title="Fork 'nfreear/dictation' on GitHub">Fork nfreear/dictation on GitHub</a>
+
+
+<script
+  src="https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@1.14.0/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js"
+  crossorigin="anonymous"
+></script>
+
+<script type="module" src="src/example-app.js"></script>
+
+</html>

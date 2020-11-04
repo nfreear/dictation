@@ -19,6 +19,7 @@ const SDK_SCRIPT = document.querySelector('script[ src *= ".speech.sdk." ]');
 const LOG = document.querySelector('#log');
 const RESULT = document.querySelector('#result');
 const PRE_OPT = document.querySelector('#options');
+const SDK_VERSION = document.querySelector('#sdk-version');
 
 console.debug('SpeechSDK:', window.SpeechSDK);
 
@@ -48,6 +49,7 @@ export function exampleApp () {
 
   recognizer.getConfiguration().then(OPT => {
     PRE_OPT.textContent = 'Options: ' + JSON.stringify(OPT, null, 2); // Was: '\t';
+    SDK_VERSION.innerHTML = `Speech SDK <i>${OPT.sdkVersion}</i>`;
   });
 
   // recognizer.addEventListener('result', ev => console.warn('Event: result.', ev));
