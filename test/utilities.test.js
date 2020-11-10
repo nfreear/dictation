@@ -6,10 +6,16 @@
 
 // @TODO: import ...
 
-function toSentence (text) {
+/** Need to trim full-stops at the end!
+ *
+ * @see https://stackoverflow.com/questions/19089442/convert-string-to-sentence-case-in-javascript#
+ */
+export function toSentence (text) {
   const sentence = text.replace(/^(\w)/, match => match.toUpperCase());
 
-  return sentence.replace(/(\w)$/, match => `${match}.`); // Was: `${sentence}.`;
+  return sentence.replace(/[.]+$/, '');
+
+  // WAS: return sentence.replace(/(\w)$/, match => `${match}.`); // Was: `${sentence}.`;
 }
 
 // -----------------------------------------------------------------------------
