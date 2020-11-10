@@ -21,10 +21,10 @@ function toSentence (text) {
 // -----------------------------------------------------------------------------
 
 describe('Test the `toSentence()` utility function.', () => {
-  test('toSentence should add a full-stop to "hello world"', () => {
+  test('toSentence should NOT add a full-stop to "hello world"', () => {
     const sentence = toSentence('hello world');
 
-    expect(sentence).toEqual('Hello world.');
+    expect(sentence).toEqual('Hello world');
   });
 
   test('toSentence should NOT add a full-stop to "hello exclamation!"', () => {
@@ -33,10 +33,16 @@ describe('Test the `toSentence()` utility function.', () => {
     expect(sentence).toEqual('Hello exclamation!');
   });
 
-  test('toSentence should NOT add a full-stop to "hello full-stop."', () => {
+  test('toSentence should TRIM a full-stop from "hello full-stop."', () => {
     const sentence = toSentence('hello full-stop.');
 
-    expect(sentence).toEqual('Hello full-stop.');
+    expect(sentence).toEqual('Hello full-stop');
+  });
+
+  test('toSentence should TRIM full-stop(s) from "hello dot dot dot..."', () => {
+    const sentence = toSentence('hello dot dot dot...');
+
+    expect(sentence).toEqual('Hello dot dot dot');
   });
 
   test('toSentence should NOT add a full-stop to "hello question mark?"', () => {
