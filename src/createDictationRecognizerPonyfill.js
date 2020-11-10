@@ -11,15 +11,22 @@
  * @see https://github.com/compulim/web-speech-cognitive-services/blob/master/packages/component/src/SpeechServices/SpeechToText/createSpeechRecognitionPonyfill.js
  */
 
+// Needed for Safari -- "TypeError: function is not a constructor (evaluating 'super()')"
+// SpeechRecognition - createDict...js:122
+import { EventTarget } from './event-target-shim.js';
+
+import { getAudioConfig } from './get-audio-config.js';
+
 // import { AudioConfig, SpeechConfig, OutputFormat, ResultReason, SpeechRecognizer } from 'SpeechSDK';
 
+// const { AudioConfig } = window.SpeechSDK;
 const {
-  SpeechConfig, AudioConfig, SpeechRecognizer, ResultReason, CancellationReason, OutputFormat
+  SpeechConfig, SpeechRecognizer, ResultReason, CancellationReason, OutputFormat
 } = window.SpeechSDK;
 
 const Event = window.Event;
 const ErrorEvent = window.ErrorEvent;
-const EventTarget = window.EventTarget;
+// WAS: const EventTarget = window.EventTarget;
 
 const DUMMY_CONFIDENCE = 0.951111;
 
@@ -54,6 +61,8 @@ export const DEFAULTS = {
   stopStatusRegex: '(NOT__EndOfDictation|InitialSilenceTimeout)',
   normalize: true, // Text normalization.
   separator: ' ',
+
+  audioConfig: getAudioConfig(), // support for Safari.
 
   url: null, // Derived!
   urlObj: null // Derived!
@@ -509,10 +518,10 @@ function createCognitiveRecognizer (options) {
   speechConfig.speechRecognitionLanguage = OPT.lang;
   speechConfig.outputFormat = OPT.format === 'detailed' ? OutputFormat.Detailed : OutputFormat.Simple;
 
-  const audioConfig = AudioConfig.fromDefaultMicrophoneInput();
+  // WAS: const audioConfig = AudioConfig.fromDefaultMicrophoneInput();
   // WAS: audioConfig.events.attachListener(new MyErrorEventListener()); // TODO: 'this' does NOT work ?!
 
-  const recognizer = new SpeechRecognizer(speechConfig, audioConfig);
+  const recognizer = new SpeechRecognizer(speechConfig, OPT.audioConfig);
 
   // const json = recognizer.internalData.agentConfig.toJsonString();
 
