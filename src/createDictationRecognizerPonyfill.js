@@ -12,21 +12,19 @@
  */
 
 // Needed for Safari -- "TypeError: function is not a constructor (evaluating 'super()')"
-// SpeechRecognition - createDict...js:122
 import { EventTarget } from './event-target-shim.js';
 
 import { getAudioConfig } from './get-audio-config.js';
 
 // import { AudioConfig, SpeechConfig, OutputFormat, ResultReason, SpeechRecognizer } from 'SpeechSDK';
 
-// const { AudioConfig } = window.SpeechSDK;
 const {
   SpeechConfig, SpeechRecognizer, ResultReason, CancellationReason, OutputFormat
 } = window.SpeechSDK;
 
-const Event = window.Event;
 const ErrorEvent = window.ErrorEvent;
-// WAS: const EventTarget = window.EventTarget;
+// Was: const Event = window.Event;
+// Was: const EventTarget = window.EventTarget;
 
 const DUMMY_CONFIDENCE = 0.951111;
 
@@ -34,9 +32,9 @@ const CUSTOM_EVENT = '_custom';
 
 class SpeechGrammarList {} // Is this enough? (window.SpeechGrammarList)
 
-export class SpeechRecognitionEvent extends Event {
+export class SpeechRecognitionEvent { // Was: extends Event {
   constructor (type, data = null) {
-    super(...arguments);
+    // super(...arguments);
 
     data = data || {};
 
@@ -45,7 +43,7 @@ export class SpeechRecognitionEvent extends Event {
     this.resultIndex = data.resultIndex || 0;
     this.results = data.results || null; // { length: 0 }; // SpeechRecognitionResultList.
 
-    // this.type = type;
+    this.type = type;
   }
 }
 
