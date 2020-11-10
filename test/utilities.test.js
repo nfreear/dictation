@@ -10,7 +10,7 @@
  *
  * @see https://stackoverflow.com/questions/19089442/convert-string-to-sentence-case-in-javascript#
  */
-export function toSentence (text) {
+function toSentence (text) {
   const sentence = text.replace(/^(\w)/, match => match.toUpperCase());
 
   return sentence.replace(/[.]+$/, '');
