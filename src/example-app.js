@@ -20,6 +20,7 @@ const LOG = document.querySelector('#log');
 const RESULT = document.querySelector('#result');
 const PRE_OPT = document.querySelector('#options');
 const ACTIONS = document.querySelector('#actions');
+const SDK_VERSION = document.querySelector('#sdk-version');
 
 console.debug('SpeechSDK:', window.SpeechSDK);
 
@@ -52,6 +53,8 @@ export function exampleApp () {
 
       ACTIONS.innerHTML = `Suggested actions: <q>${actionList.join('</q>, <q>')}</q>`;
     }
+  
+    SDK_VERSION.innerHTML = `Speech SDK <i>${OPT.sdkVersion}</i>`;
   });
 
   // recognizer.addEventListener('result', ev => console.warn('Event: result.', ev));
@@ -60,10 +63,11 @@ export function exampleApp () {
     const firstResult = ev.results[0];
     const TEXT = firstResult[0].transcript;
     // Was: const TEXT = ev._data.results[0][0].transcript;
+    const confidence = firstResult[0].confidence;
     const isFinal = firstResult.isFinal;
     const SOURCE = ev.data.source;
 
-    console.warn('Result event:', ev);
+    console.warn('Result event:', confidence, ev);
 
     RESULT.textContent = TEXT; // Or: RESULT.value!
     LOG.textContent += `Result := ${TEXT} (${SOURCE})\n`;

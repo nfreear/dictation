@@ -1,19 +1,20 @@
 {
   "private": true,
   "name": "@nfreear/speech-dictation",
-  "version": "1.0.0-beta",
+  "version": "1.1.0-beta",
   "description": "Mastering 'endSilenceTimeoutMs' in Microsoft's Speech SDK dictation mode! (08-Oct-2020)",
   "repository": "https://github.com/nfreear/dictation.git",
-  "author": "Nick Freear",
+  "author": "© Nick Freear",
   "license": "proprietary",
   "browser": "src/index.js",
   "type": "module",
   "scripts": {
     "_": "# http://localhost:9008?key=_YOUR_AZURE_SPEECH_SUBSCRIPTION_KEY",
     "start": "npm run _ && live-server --port=9008 --no-browser",
-    "test": "semistandard --fix"
+    "test": "semistandard && jest"
   },
   "devDependencies": {
+    "jest": "^26.6.1",
     "live-server": "^1.2.1",
     "semistandard": "^14.2.3"
   },
@@ -22,5 +23,11 @@
     "microsoft-cognitiveservices-speech-sdk": "^1.13.1",
     "speech-sdk-cdn": "https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@1.13.1/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js",
     "react-dictate-button": "^1.2.2"
+  },
+  "semistandard": {
+    "env": {
+      "browser": true,
+      "jest": true
+    }
   }
 }
