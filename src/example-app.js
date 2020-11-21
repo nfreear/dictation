@@ -53,7 +53,7 @@ export function exampleApp () {
 
       ACTIONS.innerHTML = `Suggested actions: <q>${actionList.join('</q>, <q>')}</q>`;
     }
-  
+
     SDK_VERSION.innerHTML = `Speech SDK <i>${OPT.sdkVersion}</i>`;
   });
 
