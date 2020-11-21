@@ -4,7 +4,7 @@
  * @author NDF, 09-October-2020.
  */
 
-import { createDictationRecognizerPonyfill, getDictationRecognizerConfig } from './index.js';
+import { createDictationRecognizerPonyfill, getDictationRecognizerConfig, fireMockActionsEvent } from './index.js';
 import { webApiSpeechRecogDemo } from './web-api-speech-recog.js';
 
 const USE_WEB_API = param(/webapi=(true)/);
@@ -19,6 +19,7 @@ const SDK_SCRIPT = document.querySelector('script[ src *= ".speech.sdk." ]');
 const LOG = document.querySelector('#log');
 const RESULT = document.querySelector('#result');
 const PRE_OPT = document.querySelector('#options');
+const ACTIONS = document.querySelector('#actions');
 const SDK_VERSION = document.querySelector('#sdk-version');
 
 console.debug('SpeechSDK:', window.SpeechSDK);
@@ -44,11 +45,15 @@ export function exampleApp () {
 
   console.debug('Ponyfill:', ponyfill);
 
-  // setDictationRecognizerConfig(options);
-  // const recognizer = new SpeechRecognition();
-
   recognizer.getConfiguration().then(OPT => {
     PRE_OPT.textContent = 'Options: ' + JSON.stringify(OPT, null, 2); // Was: '\t';
+
+    if (OPT.actionPhrasesEnable) {
+      const actionList = fireMockActionsEvent();
+
+      ACTIONS.innerHTML = `Suggested actions: <q>${actionList.join('</q>, <q>')}</q>`;
+    }
+
     SDK_VERSION.innerHTML = `Speech SDK <i>${OPT.sdkVersion}</i>`;
   });
 

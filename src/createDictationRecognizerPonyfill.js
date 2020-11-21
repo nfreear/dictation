@@ -1,6 +1,6 @@
 /**
  * A dictation-mode speech recognizer Ponyfill compatible with WebChat.js
- * that gives the user time to think!
+ * that gives the user time to think and stutter (stammer)!
  *
  * Definition of the 'createDictationRecognizerPonyfill' function.
  *
@@ -10,6 +10,8 @@
  * @see https://wicg.github.io/speech-api/#speechreco-section
  * @see https://github.com/compulim/web-speech-cognitive-services/blob/master/packages/component/src/SpeechServices/SpeechToText/createSpeechRecognitionPonyfill.js
  */
+
+import { ActionPhraseRecognizer } from './actionPhraseRecognizer.js';
 
 // Needed for Safari -- "TypeError: function is not a constructor (evaluating 'super()')"
 import { EventTarget } from './event-target-shim.js';
@@ -29,6 +31,8 @@ const ErrorEvent = window.ErrorEvent;
 const DUMMY_CONFIDENCE = 0.951111;
 
 const CUSTOM_EVENT = '_custom';
+
+const EVENT_INCOMING_ACT = 'webchat:incoming_activity';
 
 class SpeechGrammarList {} // Is this enough? (window.SpeechGrammarList)
 
@@ -59,6 +63,9 @@ export const DEFAULTS = {
   stopStatusRegex: '(NOT__EndOfDictation|InitialSilenceTimeout)',
   normalize: true, // Text normalization.
   separator: ' ',
+
+  actionPhrasesEnable: false,
+  actionPhrasesEventName: EVENT_INCOMING_ACT,
 
   audioConfig: getAudioConfig(), // support for Safari.
 
@@ -116,8 +123,14 @@ export function toSentence (text) {
 
 // ------------------------------------------------------------------
 
-export function createSpeechRecognitionFromRecognizer (createRecognizer, options) {
-  // ...
+function createSpeechRecognitionFromRecognizer (createRecognizer, options) {
+  // Extend options with the defaults.
+  const _OPT = { ...DEFAULTS, ...options };
+
+  // Create ActionPhraseRecognizer early!
+  const actionRecognizer = _OPT.actionPhrasesEnable
+    ? new ActionPhraseRecognizer(_OPT.actionPhrasesEventName)
+    : null;
 
   class SpeechRecognition extends EventTarget {
     constructor () {
@@ -136,6 +149,7 @@ export function createSpeechRecognitionFromRecognizer (createRecognizer, options
       const PRIV = this.priv = {
         OPT: null, // Plain object.
         recognizer: null, // Class instance.
+        actionRecognizer,
         // ..!
         started: null, // Boolean.
         finalResultSent: null, // Boolean.
@@ -346,10 +360,16 @@ export function createSpeechRecognitionFromRecognizer (createRecognizer, options
             PRIV.confidences.push(RES._confidence);
             PRIV.details.push(RES.json);
 
-            /** @NOTE We're waiting for "timeouts", so we purposefully
-             * "downgrade" a 'success' result to an interim result !!
-             */
-            this._dispatchResultEvent(recEvent, false, source);
+            if (PRIV.actionRecognizer && PRIV.actionRecognizer.found(TEXT)) {
+              this._dispatchResultEvent(recEvent, true, `${source}.actionRecognized`);
+              this.stop();
+              // PRIV.finalResultSent = true;
+            } else {
+              /** @NOTE We're waiting for "timeouts", so we purposefully
+               * "downgrade" a 'success' result to an interim result !!
+               */
+              this._dispatchResultEvent(recEvent, false, source);
+            }
 
             /* if (!PRIV.finalResultSent) {
               this._dispatchResultEvent(recEvent, true, source);
