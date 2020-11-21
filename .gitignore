@@ -4,10 +4,10 @@ external
 node_modules
 SpeechSDK-Javascript*
 *BAK*
-
-directline-config.js
-
+*.diff
+*config.js
 *base.js
-test.html
-*Mock*
 types.ts
+
+*.html
+!index.html

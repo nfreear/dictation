@@ -1,10 +1,10 @@
 {
   "private": true,
   "name": "@nfreear/speech-dictation",
-  "version": "1.1.0-dev",
+  "version": "1.1.0-beta",
   "description": "Mastering 'endSilenceTimeoutMs' in Microsoft's Speech SDK dictation mode! (08-Oct-2020)",
   "repository": "https://github.com/nfreear/dictation.git",
-  "author": "Nick Freear",
+  "author": "© Nick Freear",
   "license": "proprietary",
   "browser": "src/index.js",
   "type": "module",
