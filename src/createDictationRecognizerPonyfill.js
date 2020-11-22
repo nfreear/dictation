@@ -11,7 +11,7 @@
  * @see https://github.com/compulim/web-speech-cognitive-services/blob/master/packages/component/src/SpeechServices/SpeechToText/createSpeechRecognitionPonyfill.js
  */
 
-import { ActionPhraseRecognizer } from './actionPhraseRecognizer.js';
+import { ActionPhraseRecognizer, ACTION_DEFAULTS } from './actionPhraseRecognizer.js';
 
 // Needed for Safari -- "TypeError: function is not a constructor (evaluating 'super()')"
 import { EventTarget } from './event-target-shim.js';
@@ -31,8 +31,6 @@ const ErrorEvent = window.ErrorEvent;
 const DUMMY_CONFIDENCE = 0.951111;
 
 const CUSTOM_EVENT = '_custom';
-
-const EVENT_INCOMING_ACT = 'webchat:incoming_activity';
 
 class SpeechGrammarList {} // Is this enough? (window.SpeechGrammarList)
 
@@ -64,8 +62,8 @@ export const DEFAULTS = {
   normalize: true, // Text normalization.
   separator: ' ',
 
-  actionPhrasesEnable: false,
-  actionPhrasesEventName: EVENT_INCOMING_ACT,
+  actionRecognizerEnable: false,
+  actionRecognizerOptions: ACTION_DEFAULTS,
 
   audioConfig: getAudioConfig(), // support for Safari.
 
@@ -128,8 +126,8 @@ function createSpeechRecognitionFromRecognizer (createRecognizer, options) {
   const _OPT = { ...DEFAULTS, ...options };
 
   // Create ActionPhraseRecognizer early!
-  const actionRecognizer = _OPT.actionPhrasesEnable
-    ? new ActionPhraseRecognizer(_OPT.actionPhrasesEventName)
+  const actionRecognizer = _OPT.actionRecognizerEnable
+    ? new ActionPhraseRecognizer(_OPT.actionRecognizerOptions)
     : null;
 
   class SpeechRecognition extends EventTarget {

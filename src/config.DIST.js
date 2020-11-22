@@ -10,13 +10,19 @@
  * @see https://github.com/nfreear/dictation/blob/main/src/createDictationRecognizerPonyfill.js#L42-L57
  */
 
+export const EVENT_INCOMING_ACT = 'webchat:incoming_activity';
+
 // Refer to 'DEFAULTS' :~ ./src/createDictationRecognizerPonyfill.js#L42-L57
 export function getDictationRecognizerConfig () {
   return {
     subscriptionKey: param(/[?&]key=(\w+)/, '__EDIT_ME__'), // << Add your subscription key <<
     region: param(/region=(\w+)/, 'westeurope'),
     lang: param(/lang=([\w-]+)/, 'en-GB'),
-    actionPhrasesEnable: !!param(/action(?:s)?=(1|true|enable)/, false)
+    actionRecognizerEnable: !!param(/action(?:s)?=(1|true|enable)/, false),
+    actionRecognizerOptions: {
+      eventName: EVENT_INCOMING_ACT,
+      initialActionPhrases: ['help', 'help me']
+    }
     /*
     format: 'detailed', // Was: OutputFormat.Detailed,
     mode: 'dictation',

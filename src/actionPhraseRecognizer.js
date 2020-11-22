@@ -4,14 +4,26 @@
  * @author Nick Freear, 23-October-2020.
  */
 
+export const ACTION_DEFAULTS = {
+  eventName: null,
+  eventTarget: window,
+  initialActionPhrases: []
+  /** @IDEA trimPhrases: [ 'please', 'thanks', 'thank you' ] */
+};
+
 export class ActionPhraseRecognizer {
-  constructor (incomingEventName, target = window) {
-    this.eventName = incomingEventName;
-    this.target = target;
+  constructor (options = {}) {
+    const _OPT = this.OPT = { ...ACTION_DEFAULTS, ...options };
 
     this._resetDictionary();
+    if (_OPT.initialActionPhrases) {
+      this.addToDictionary(_OPT.initialActionPhrases);
+    }
 
-    this.target.addEventListener(this.eventName, ev => this._handleIncomingEvent(ev));
+    const TARGET = _OPT.eventTarget;
+    const EVENT = _OPT.eventName;
+
+    TARGET.addEventListener(EVENT, ev => this._handleIncomingEvent(ev));
 
     console.debug(this.constructor.name, this);
   }
@@ -50,16 +62,17 @@ export class ActionPhraseRecognizer {
     // ( event.data = action.payload.activity )
     const activity = ev.data;
 
-    console.debug(this.constructor.name, 'Incoming event:', activity, ev);
+    // console.debug(this.constructor.name, 'Incoming event:', activity, ev);
 
     // IF activity contains "suggested actions",
     // THEN add to dictionary.
 
+    const IS_ACTIVITY = activity.type && /(message|event)/.test(activity.type);
     const ACTIONS = activity.suggestedActions && activity.suggestedActions.actions.length
       ? activity.suggestedActions.actions
       : null;
 
-    if (activity.type === 'message' && ACTIONS) {
+    if (IS_ACTIVITY && ACTIONS) {
       const actionPhrases = ACTIONS.map(action => action.title);
 
       this.addToDictionary(actionPhrases);

@@ -4,9 +4,11 @@
  * @author Nick Freear, 25-October-2020.
  */
 
+import { EVENT_INCOMING_ACT } from '../src/config.DIST.js';
+
 const Event = window.Event;
 
-export const EVENT_INCOMING_ACT = 'webchat:incoming_activity';
+// Was: export const EVENT_INCOMING_ACT = 'webchat:incoming_activity';
 
 const MOCK_ACTIVITY = {
   type: 'DIRECT_LINE/INCOMING_ACTIVITY',
@@ -35,10 +37,15 @@ const MOCK_ACTIVITY = {
             title: 'Watch the video',
             value: 'Watch the video'
           },
+
           {
             type: 'imBack',
-            title: 'No thanks',
-            value: 'No thanks'
+            title: 'Yes',
+            value: 'Yes'
+          }, {
+            type: 'imBack',
+            title: 'No', // Was: 'No thanks'
+            value: 'No'
           },
 
           {
@@ -66,7 +73,7 @@ export function fireMockActionsEvent () {
 
   const ACTIONS = MOCK_ACTIVITY.payload.activity.suggestedActions.actions.map(act => act.title);
 
-  console.debug('dispatchEvent:', event);
+  console.debug('fireMockActionsEvent:', event);
 
   return ACTIONS;
 }
