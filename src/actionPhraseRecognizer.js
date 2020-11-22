@@ -1,6 +1,13 @@
 /**
+ * ADMINS chat-bot.
+ *
+ * @copyright © 2020 The Open University (IET-LTT).
+ */
+
+/**
  * Tell a speech recognizer to return "stop" or "action" phrase results immediately.
  *
+ * @copyright © 2020 Nick Freear.
  * @author Nick Freear, 23-October-2020.
  */
 
@@ -8,7 +15,7 @@ export const ACTION_DEFAULTS = {
   eventName: null,
   eventTarget: window,
   initialActionPhrases: []
-  /** @IDEA trimPhrases: [ 'please', 'thanks', 'thank you' ] */
+  /** @IDEA trimPhrases: ['please', 'thanks', 'thank you'] */
 };
 
 export class ActionPhraseRecognizer {

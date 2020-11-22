@@ -1,5 +1,10 @@
+/**
+ * The API.
+ *
+ * @copyright © 2020 Nick Freear.
+ */
 
-export { createDictationRecognizerPonyfill } from './createDictationRecognizerPonyfill.js';
+export { createDictationRecognizerPonyfill, DEFAULTS } from './createDictationRecognizerPonyfill.js';
 
 export { getDictationRecognizerConfig } from './config.DIST.js';
 

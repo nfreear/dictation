@@ -1,9 +1,16 @@
 /**
+ * ADMINS chat-bot.
+ *
+ * @copyright © 2020 The Open University (IET-LTT).
+ */
+
+/**
  * A dictation-mode speech recognizer Ponyfill compatible with WebChat.js
  * that gives the user time to think and stutter (stammer)!
  *
  * Definition of the 'createDictationRecognizerPonyfill' function.
  *
+ * @copyright © 2020 Nick Freear.
  * @author Nick Freear, 21-October-2020.
  * @source https://github.com/nfreear/dictation
  *

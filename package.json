@@ -4,12 +4,12 @@
   "version": "2.0.0-beta",
   "description": "Dictation-mode speech recognizer ponyfill compatible with WebChat that gives the user time to think and stutter.",
   "repository": "https://github.com/nfreear/dictation.git",
-  "author": "© Nick Freear",
+  "author": "© Nick Freear, 08-Oct-2020",
   "license": "proprietary",
   "browser": "src/index.js",
   "type": "module",
   "scripts": {
-    "_": "# http://localhost:9008?key=_YOUR_AZURE_SPEECH_SUBSCRIPTION_KEY",
+    "_": "# http://localhost:9008?key=_YOUR_AZURE_SPEECH_SUBSCRIPTION_KEY&actions=true",
     "start": "npm run _ && live-server --port=9008 --no-browser",
     "test": "semistandard --fix && jest"
   },

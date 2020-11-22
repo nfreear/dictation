@@ -1,8 +1,6 @@
 [![Test status][ci-badge]][ci]
 
-# @ndf/speech-dictation-test
-
-__Work-in-progress!__
+# @nfreear/speech-dictation
 
 A dictation-mode speech recognizer _ponyfill_ compatible with [WebChat][]
 that gives the user time to think and stutter (_stammer_)!

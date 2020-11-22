@@ -1,7 +1,8 @@
 /**
  * A demo application of the dictation-mode speech recognizer.
  *
- * @author NDF, 09-October-2020.
+ * @copyright © 2020 Nick Freear.
+ * @author Nick Freear, 09-October-2020.
  */
 
 import { createDictationRecognizerPonyfill, getDictationRecognizerConfig, fireMockActionsEvent } from './index.js';
