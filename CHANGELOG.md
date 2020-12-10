@@ -3,8 +3,9 @@
 
 ## Version 2.0.0-Beta
 
-* Date: __WIP__.
-* Adaptive recognition — set a static and/or dynamic dictionary of "_stop phrases_" (#3)
+* Date: 23-November-2020.
+* Adaptive recognition — optionally, set a dictionary of "_stop phrases_" via a `DOM` event (#3)
+* Adaptive recognition — optionally, set an initial dictionary of "_stop phrases_" (#3)
 
 ## Version 1.1.0-Beta
 

@@ -1,3 +1,6 @@
+/**
+ * @DEPRECATED - Not in use!
+ */
 
 const CustomEvent = window.CustomEvent;
 
