@@ -20,6 +20,8 @@
 
 import { ActionPhraseRecognizer, ACTION_DEFAULTS } from './actionPhraseRecognizer.js';
 
+import { handleSetTimeoutEvent } from './setTimeoutEvent.js';
+
 // Needed for Safari -- "TypeError: function is not a constructor (evaluating 'super()')"
 import { EventTarget } from './event-target-shim.js';
 
@@ -162,7 +164,8 @@ function createSpeechRecognitionFromRecognizer (createRecognizer, options) {
         interims: null, // Hypotheses array.
         BUFFER: null, // Final text array.
         confidences: null, // Array of confidence numbers, for the final text (Range: 0.001-0.999).
-        details: null // Array of recognized event results (NBest, etc).
+        details: null, // Array of recognized event results (NBest, etc).
+        setTimeoutEvent: null // Event received ?!
       };
 
       PRIV.reset = () => {
@@ -198,6 +201,8 @@ function createSpeechRecognitionFromRecognizer (createRecognizer, options) {
         return avConfidence || DUMMY_CONFIDENCE;
       };
 
+      handleSetTimeoutEvent(ev => { PRIV.setTimeoutEvent = ev; });
+
       // We need this call, so that 'priv.initializeOnce()' exists!
       this.getConfiguration();
     }
@@ -226,7 +231,24 @@ function createSpeechRecognitionFromRecognizer (createRecognizer, options) {
 
           return PRIV.recognizer;
         };
+
+        PRIV.resetRecognizer = async () => {
+          if (PRIV.setTimeoutEvent) {
+            const resetOpt = PRIV.OPT;
+            const resetEvent = PRIV.setTimeoutEvent;
+            resetOpt.endSilenceTimeoutMs = resetEvent.data.endSilenceTimeoutMs;
+
+            const { recognizer, OPT } = await createRecognizer(resetOpt);
+
+            PRIV.setTimeoutEvent = null;
+            PRIV.OPT = OPT;
+            PRIV.recognizer = recognizer;
+
+            console.debug('>>>> Re-created recognizer:', this);
+          }
+        };
       });
+
       return promise;
     }
 
@@ -435,6 +457,8 @@ function createSpeechRecognitionFromRecognizer (createRecognizer, options) {
             this._dispatchResultEvent(recEvent, true, 'sessionStopped');
             PRIV.finalResultSent = true;
           }
+
+          PRIV.resetRecognizer();
         };
 
         /* recognizer.speechStartDetected = (_s, { offset, sessionId }) => {

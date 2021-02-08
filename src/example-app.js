@@ -6,6 +6,7 @@
  */
 
 import { createDictationRecognizerPonyfill, getDictationRecognizerConfig, fireMockActionsEvent } from './index.js';
+import { dispatchSetTimeoutEvent } from './setTimeoutEvent.js';
 import { webApiSpeechRecogDemo } from './web-api-speech-recog.js';
 
 const USE_WEB_API = param(/webapi=(true)/);
@@ -78,6 +79,8 @@ export function exampleApp () {
     } else {
       onRecognitionStart();
     }
+
+    dispatchSetTimeoutEvent(TEXT);
   };
 
   recognizer.onend = (ev) => {
@@ -128,7 +131,7 @@ export function exampleApp () {
 
     recognizer.stop(() => onRecognitionStop());
   });
-}
+} // End function.
 
 // ----------------------------------------------------
 
