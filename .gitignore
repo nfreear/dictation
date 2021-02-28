@@ -12,3 +12,5 @@ types.ts
 *.html
 !index.html
 !bug.html
+
+setTimeout*.js

@@ -70,9 +70,8 @@ npm test
  * [GitHub: @compulim/react-dictate-button `../Composer.js`][dict-btn-recog];
 
 ---
-© 2020 Nick Freear.
-
 © 2020 The Open University. All rights reserved. (_Proprietary - NOT released as open source!_)
+<!-- © 2020 Nick Freear. -->
 
 [gist]: https://gist.github.com/nfreear/f875994f45c97518cd8c42c786998c84
 [b-131]: https://github.com/Azure-Samples/cognitive-services-speech-sdk/issues/131

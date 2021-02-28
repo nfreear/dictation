@@ -1,3 +1,7 @@
+:root {
+  --border-grey: #bbb;
+  --pale-grey: #e6e6e6;
+}
 
 body {
   color: #333;
@@ -21,8 +25,8 @@ label {
 #actions,
 pre,
 textarea {
-  background: #e6e6e6;
-  border: 1px solid #aaa;
+  background: var(--pale-grey);
+  border: 1px solid var(--border-grey);
   border-radius: .25rem;
   font-size: small;
   margin: 1.5rem 0;
@@ -65,7 +69,7 @@ textarea {
 
 #recognizer-status {
   background: red center/90% url(./microphone.svg) no-repeat;
-  border: 1px solid #bbb;
+  border: 1px solid var(--border-grey);
   border-radius: 50%;
   /* cursor: help; */
   display: inline-block;
@@ -95,8 +99,10 @@ textarea {
 }
 
 footer {
-  border-top: 2px solid #ccc;
+  background: var(--pale-grey);
+  border-top: 1px solid var(--border-grey);
+  color: #555;
   font-size: small;
-  margin-top: 2.5rem;
-  padding-top: .5rem;
+  margin-top: 2rem;
+  padding: .4rem .2rem;
 }
