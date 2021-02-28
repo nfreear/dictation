@@ -65,6 +65,7 @@ textarea {
 
 #recognizer-status {
   background: red center/90% url(./microphone.svg) no-repeat;
+  border: 1px solid #bbb;
   border-radius: 50%;
   /* cursor: help; */
   display: inline-block;
@@ -83,10 +84,19 @@ textarea {
   cursor: wait;
 }
 
+.github-fork-ribbon:before,
+.github-fork-ribbon:after,
 .hide {
   display: none;
 }
 
 .github-fork-ribbon:before {
   background-color: #060;
+}
+
+footer {
+  border-top: 2px solid #ccc;
+  font-size: small;
+  margin-top: 2.5rem;
+  padding-top: .5rem;
 }
