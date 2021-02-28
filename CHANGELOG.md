@@ -1,6 +1,12 @@
 
 # Release Notes
 
+## Unreleased
+
+* (Date: ~ February-2021)
+* Adaptive recognition - personalize the `endSilenceTimeoutMs` mid-session enhancement (#13)
+* Fix: upgrade from speech SDK v1.13.1 to v1.15.1 (#14)
+
 ## Version 2.0.0-Beta
 
 * Date: 23-November-2020.
@@ -11,15 +17,16 @@
 
 * Date: 21-November-2020.
 * Fix support for Safari — `getAudioConfig` (#10)
-* Downgrade / use Speech SDK v1.13.1 — bug in 1.14.0 (#8)
+* Fix. Downgrade / use Speech SDK v1.13.1 — bug in 1.14.0 (#8)
 * Fix text normalization — remove full-stop (#11)
 
 ## Version 1.0.0-Beta
 
 Dictation-based speech recognizer ponyfill, compatible with WebChat.js
 
-* Version 1.0.0-Beta, as integrated in 'ADMINS-Bot' (23-October-2020)
-* Related bugs:  (#1), (#2),
 * Date: 23-October-2020.
+* Version 1.0.0-Beta, as integrated in '_ADMINS-Bot_' (23-October-2020)
+* Re-factor, influenced by `compulim/web-speech-cognitive-services` ~ `createSpeechRecognitionPonyfill` (#2),
+* Align `DictationRecognizer` class with Web API `SpeechRecognition` class (#1).
 
 ---
