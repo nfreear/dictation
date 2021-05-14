@@ -88,6 +88,7 @@ textarea {
   cursor: wait;
 }
 
+footer a[ href *= github ],
 .github-fork-ribbon:before,
 .github-fork-ribbon:after,
 .hide {

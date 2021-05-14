@@ -2,6 +2,8 @@
 
 # @nfreear/speech-dictation
 
+__[NOT released as open source](#credit)__
+
 An adaptive dictation-mode speech recognizer _ponyfill_ compatible with [WebChat][]
 that gives the user time to think and stutter (_stammer_)!
 
@@ -69,9 +71,21 @@ npm test
  * [GitHub: @compulim/web-speech-cognitive-services `../create...Ponyfill.js`][comp-ponyfill];
  * [GitHub: @compulim/react-dictate-button `../Composer.js`][dict-btn-recog];
 
+## Credit
+
+Developed in [IET][] for the [ADMINS][] project, funded by [Microsoft][ms].
+
 ---
-© 2020 The Open University. All rights reserved. (_Proprietary - NOT released as open source!_)
+[©][c] 2020 The Open University. All rights reserved. (_Proprietary — NOT released as open source!_)
 <!-- © 2020 Nick Freear. -->
+
+[c]: https://www.open.ac.uk/copyright "Copyright © The Open University (IET)."
+[ou]: http://www.open.ac.uk "The Open University"
+[iet]: https://iet.open.ac.uk/ "Institute of Educational Technology, at The Open University."
+[adimins]: https://iet.open.ac.uk/projects/admins
+  "ADMINS in IET: Assistants to the Disclosure and Management of Information about Needs and Support"
+[ms]: https://microsoft.com/en-gb/ai/ai-for-accessibility-projects#:~:text=ADMINS
+  "Microsoft 'AI for Accessibility' projects, including ADMINS"
 
 [gist]: https://gist.github.com/nfreear/f875994f45c97518cd8c42c786998c84
 [b-131]: https://github.com/Azure-Samples/cognitive-services-speech-sdk/issues/131
