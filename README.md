@@ -82,7 +82,7 @@ Developed in [IET][] for the [ADMINS][] project, funded by [Microsoft][ms].
 [c]: https://www.open.ac.uk/copyright "Copyright © The Open University (IET)."
 [ou]: http://www.open.ac.uk "The Open University"
 [iet]: https://iet.open.ac.uk/ "Institute of Educational Technology, at The Open University."
-[adimins]: https://iet.open.ac.uk/projects/admins
+[admins]: https://iet.open.ac.uk/projects/admins
   "ADMINS in IET: Assistants to the Disclosure and Management of Information about Needs and Support"
 [ms]: https://microsoft.com/en-gb/ai/ai-for-accessibility-projects#:~:text=ADMINS
   "Microsoft 'AI for Accessibility' projects, including ADMINS"
