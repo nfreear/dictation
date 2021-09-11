@@ -1,12 +1,32 @@
 {
   "private": true,
-  "name": "@nfreear/speech-dictation",
-  "version": "2.0.0-beta",
-  "description": "Dictation-mode speech recognizer ponyfill compatible with WebChat that gives the user time to think and stutter.",
-  "x-copyright": "© 2020 The Open University. All rights reserved.",
-  "license": "proprietary",
-  "repository": "https://github.com/nfreear/dictation.git",
-  "author": "© Nick Freear, 08-Oct-2020",
+  "name": "__TODO_NAME__",
+  "version": "2.0.1",
+  "description": "Adaptive dictation-mode speech recognizer ponyfill compatible with WebChat that gives the user time to think and stutter | © 2020 The Open University (IET).",
+  "license": "__TODO_LICENSE__",
+  "keywords": [
+    "ADMINS",
+    "IET-OU",
+    "adaptive",
+    "stammer",
+    "stutter",
+    "cognitive services",
+    "dictation",
+    "microphone",
+    "polyfill",
+    "speak",
+    "speech recognition",
+    "speech to text",
+    "stt",
+    "unified speech",
+    "utterance",
+    "voice recognition",
+    "web speech",
+    "webrtc",
+    "webspeech"
+  ],
+  "repository": "https://github.com/IET-OU/__TODO_NAME__.git",
+  "author": "Nick Freear <nfreear@yahoo.co.uk> (https://nick.freear.org.uk)",
   "browser": "src/index.js",
   "type": "module",
   "scripts": {
@@ -25,6 +45,9 @@
     "speech-sdk-cdn": "https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@1.15.1/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js",
     "react-dictate-button": "^1.2.2"
   },
+  "files": [
+    "src/*.js"
+  ],
   "semistandard": {
     "env": {
       "browser": true,

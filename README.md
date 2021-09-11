@@ -1,11 +1,9 @@
 [![Test status][ci-badge]][ci]
 
-# @nfreear/speech-dictation
-
-__[NOT released as open source](#credit)__
+# __TODO_NAME__
 
 An adaptive dictation-mode speech recognizer _ponyfill_ compatible with [WebChat][]
-that gives the user time to think and stutter (_stammer_)!
+that gives the user time to think and _stutter_ / _stammer_!
 
 > Mastering '`endSilenceTimeoutMs`' in Microsoft [Speech SDK][sdk] dictation mode!
 
@@ -41,7 +39,8 @@ and enable the setting of `initialSilenceTimeoutMs` and `endSilenceTimeoutMs`:
 ```javascript
 const initialSilenceTimeoutMs = 5 * 1000;
 const endSilenceTimeoutMs = 5 * 1000;
-// Scroll to right! → →
+
+// The cognitive service URL with timeouts. Scroll to right! → →
 const url = `wss://${region}.stt.speech.microsoft.com/speech/recognition/dictation/cognitiveservices/v1?initialSilenceTimeoutMs=${initialSilenceTimeoutMs || ''}&endSilenceTimeoutMs=${endSilenceTimeoutMs}&`;
 const urlObj = new URL(url);
 
@@ -75,6 +74,10 @@ npm test
 
 Developed in [IET][] for the [ADMINS][] project, funded by [Microsoft][ms].
 
+## License
+
+License: __TODO_LICENSE__
+
 ---
 [©][c] 2020 The Open University. All rights reserved. (_Proprietary — NOT released as open source!_)
 <!-- © 2020 Nick Freear. -->
@@ -83,7 +86,7 @@ Developed in [IET][] for the [ADMINS][] project, funded by [Microsoft][ms].
 [ou]: http://www.open.ac.uk "The Open University"
 [iet]: https://iet.open.ac.uk/ "Institute of Educational Technology, at The Open University."
 [admins]: https://iet.open.ac.uk/projects/admins
-  "ADMINS in IET: Assistants to the Disclosure and Management of Information about Needs and Support"
+  "ADMINS in IET: Assistants to the Disclosure and Management of Information about Needs and Support (2020)"
 [ms]: https://microsoft.com/en-gb/ai/ai-for-accessibility-projects#:~:text=ADMINS
   "Microsoft 'AI for Accessibility' projects, including ADMINS"
 
