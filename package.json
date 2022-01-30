@@ -1,5 +1,4 @@
 {
-  "private": true,
   "name": "__TODO_NAME__",
   "version": "2.0.1",
   "description": "Adaptive dictation-mode speech recognizer ponyfill compatible with WebChat that gives the user time to think and stutter | © 2020 The Open University (IET).",
@@ -26,7 +25,10 @@
     "webspeech"
   ],
   "repository": "https://github.com/IET-OU/__TODO_NAME__.git",
-  "author": "Nick Freear <nfreear@yahoo.co.uk> (https://nick.freear.org.uk)",
+  "author": "Learning & Teaching Technologies team <iet-ltt-support@open.ac.uk>",
+  "contributors": [
+    "Nick Freear <nfreear@yahoo.co.uk> (https://nick.freear.org.uk)"
+  ],
   "browser": "src/index.js",
   "type": "module",
   "scripts": {
@@ -39,7 +41,7 @@
     "live-server": "^1.2.1",
     "semistandard": "^14.2.3"
   },
-  "peerDependencies": {
+  "cdnDependencies": {
     "botframework-webchat-root": "^4.10.1",
     "microsoft-cognitiveservices-speech-sdk": "^1.15.1",
     "speech-sdk-cdn": "https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@1.15.1/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js",

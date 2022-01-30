@@ -1,7 +1,8 @@
 /**
  * The API.
  *
- * @copyright © 2020 Nick Freear.
+ * @copyright © 2020 The Open University (IET-LTT).
+ * @license __TODO_LICENSE__
  */
 
 export { createDictationRecognizerPonyfill, DEFAULTS } from './createDictationRecognizerPonyfill.js';

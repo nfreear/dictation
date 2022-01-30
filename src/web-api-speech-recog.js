@@ -1,7 +1,7 @@
 /**
  * Example of using the native Web Api SpeechRecognition class.
  *
- * @author NDF, 13-Oct-2020.
+ * @author Nick Freear, 13-Oct-2020.
  * @see https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition#Examples
  */
 

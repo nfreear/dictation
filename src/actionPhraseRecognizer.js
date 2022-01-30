@@ -7,7 +7,6 @@
 /**
  * Tell a speech recognizer to return "stop" or "action" phrase results immediately.
  *
- * @copyright © 2020 Nick Freear.
  * @author Nick Freear, 23-October-2020.
  */
 

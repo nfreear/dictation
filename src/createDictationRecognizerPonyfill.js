@@ -10,7 +10,6 @@
  *
  * Definition of the 'createDictationRecognizerPonyfill' function.
  *
- * @copyright © 2020 Nick Freear.
  * @author Nick Freear, 21-October-2020.
  * @source https://github.com/nfreear/dictation
  *

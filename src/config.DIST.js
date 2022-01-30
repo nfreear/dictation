@@ -1,5 +1,5 @@
 /**
- * Microsoft speech service configuration
+ * Configuration for Microsoft speech service.
  *
  * 1. Copy and rename this file to: "directline-config.js" (?!)
  * 2. Add your speech subscription key below.

@@ -72,15 +72,14 @@ npm test
 
 ## Credit
 
-Developed in [IET][] for the [ADMINS][] project, funded by [Microsoft][ms].
+Developed by the Learning & Teaching Technologies team in [IET][] for the [ADMINS][] project, funded by [Microsoft][ms].
 
 ## License
 
 License: __TODO_LICENSE__
 
 ---
-[©][c] 2020 The Open University. All rights reserved. (_Proprietary — NOT released as open source!_)
-<!-- © 2020 Nick Freear. -->
+[©][c] 2020 The Open University. All rights reserved.
 
 [c]: https://www.open.ac.uk/copyright "Copyright © The Open University (IET)."
 [ou]: http://www.open.ac.uk "The Open University"
