@@ -3,10 +3,10 @@
   "name": "@nfreear/speech-dictation",
   "version": "2.0.0-beta",
   "description": "Dictation-mode speech recognizer ponyfill compatible with WebChat that gives the user time to think and stutter.",
-  "x-copyright": "© 2020 The Open University. All rights reserved.",
-  "license": "proprietary",
+  "license": "MIT",
   "repository": "https://github.com/nfreear/dictation.git",
   "author": "© Nick Freear, 08-Oct-2020",
+  "main": "src/index.js",
   "browser": "src/index.js",
   "type": "module",
   "scripts": {

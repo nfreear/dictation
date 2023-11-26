@@ -1,6 +1,7 @@
 /**
  * A demo application of the dictation-mode speech recognizer.
  *
+ * @license MIT.
  * @copyright © 2020 Nick Freear.
  * @author Nick Freear, 09-October-2020.
  */

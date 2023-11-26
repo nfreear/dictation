@@ -1,7 +1,7 @@
 /**
  * ADMINS chat-bot.
  *
- * @copyright © 2020 The Open University (IET-LTT).
+ * @license MIT.
  */
 
 /**

@@ -1,6 +1,7 @@
 /**
  * The API.
  *
+ * @license MIT.
  * @copyright © 2020 Nick Freear.
  */
 

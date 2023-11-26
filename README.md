@@ -73,10 +73,9 @@ npm test
 
 ## Credit
 
-Developed in [IET][] for the [ADMINS][] project, funded by [Microsoft][ms].
+Developed in [IET][] at [The Open University][ou] for the [ADMINS][] project, funded by [Microsoft][ms].
 
 ---
-[©][c] 2020 The Open University. All rights reserved. (_Proprietary — NOT released as open source!_)
 <!-- © 2020 Nick Freear. -->
 
 [c]: https://www.open.ac.uk/copyright "Copyright © The Open University (IET)."
