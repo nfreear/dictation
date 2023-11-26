@@ -4,6 +4,10 @@ name: Node CI
 
 on: [push]
 
+# See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+env:
+  NODE_VERSION: 18
+
 jobs:
 
   build:
@@ -13,23 +17,17 @@ jobs:
     # https://github.com/marketplace/actions/skip-based-on-commit-message
     if: "!contains( github.event.head_commit.message, 'ci skip' )"
 
-    strategy:
-      matrix:
-        node-version: [ 12.x ]
-
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 1
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
+    - name: Use Node.js ${{ env.NODE_VERSION }}
+      uses: actions/setup-node@v3
       with:
-        node-version: ${{ matrix.node-version }}
-    - name: npm install, build, and test
-      run: |
-        npm ci
-        npm run build --if-present
-        npm test
+        node-version: ${{ env.NODE_VERSION }}
+    - run: npm ci
+    - run: npm run build --if-present
+    - run: npm test
       env:
         CI_SKIP: false
 
