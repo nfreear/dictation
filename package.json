@@ -11,15 +11,15 @@
   "type": "module",
   "scripts": {
     "_": "# http://localhost:9008?key=_YOUR_AZURE_SPEECH_SUBSCRIPTION_KEY&actions=true",
-    "start": "npm run _ && live-server --port=9008 --no-browser",
-    "test": "semistandard --fix && jest"
+    "start": "npm run _ && servor",
+    "test": "semistandard && jest"
   },
   "devDependencies": {
-    "jest": "^26.6.1",
-    "live-server": "^1.2.1",
-    "semistandard": "^14.2.3"
+    "jest": "^29.7.0",
+    "semistandard": "^17.0.0",
+    "servor": "^4.0.2"
   },
-  "peerDependencies": {
+  "CDN_peerDependencies": {
     "botframework-webchat-root": "^4.10.1",
     "microsoft-cognitiveservices-speech-sdk": "^1.15.1",
     "speech-sdk-cdn": "https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@1.15.1/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js",

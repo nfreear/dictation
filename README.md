@@ -2,8 +2,6 @@
 
 # @nfreear/speech-dictation
 
-__[NOT released as open source](#credit)__
-
 An adaptive dictation-mode speech recognizer _ponyfill_ compatible with [WebChat][]
 that gives the user time to think and stutter (_stammer_)!
 

@@ -4,6 +4,8 @@
  * @author NDF, 27-Nov-2020.
  */
 
+/* globals describe, expect, test */
+
 // @TODO: import ...
 
 /** Need to trim full-stops at the end!
