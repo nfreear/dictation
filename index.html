@@ -1,4 +1,4 @@
-<!doctype html><html lang="en-GB"> <title> *Dictation test </title>
+<!doctype html><html lang="en-GB"> <title> *Adaptive speech recognition test </title>
 
 <meta name="robots" content="noindex,nofollow" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -8,7 +8,7 @@
 <link rel="icon" href="data:," /><!-- Prevent favicon 404s! -->
 
 
-<h1> Dictation test </h1>
+<h1> Adaptive speech recognition test </h1>
 
 <p id="sdk-version"></p>
 
@@ -36,10 +36,21 @@
 
 
 <script
-  data-X-src="external/microsoft.cognitiveservices.speech.sdk.bundle.js"
-  src="https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@1.15.1/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js"
+  data-X-src="https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@1.15.1/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js"
   crossorigin="anonymous"
 ></script>
+
+<script type="importmap">
+{
+  "imports": {
+    "adapt-speech-recog": "./src/index.js",
+    "patient-speech-recog": "./src/index.js",
+    "web-speech-recog": "./src/web-api-speech-recog.js",
+    "ms-cog-speech-sdk.v1.15.1": "https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@1.15.1/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js",
+    "ms-cog-speech-sdk": "https://unpkg.com/microsoft-cognitiveservices-speech-sdk@1.33.1/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js"
+  }
+}
+</script>
 
 <script type="module" src="src/example-app.js"></script>
 

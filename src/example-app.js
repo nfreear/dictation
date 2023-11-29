@@ -6,8 +6,9 @@
  * @author Nick Freear, 09-October-2020.
  */
 
-import { createDictationRecognizerPonyfill, getDictationRecognizerConfig, fireMockActionsEvent } from './index.js';
-import { webApiSpeechRecogDemo } from './web-api-speech-recog.js';
+import 'ms-cog-speech-sdk';
+import { createDictationRecognizerPonyfill, getDictationRecognizerConfig, fireMockActionsEvent } from 'adapt-speech-recog';
+import { webApiSpeechRecogDemo } from 'web-speech-recog';
 
 const USE_WEB_API = param(/webapi=(true)/);
 
@@ -16,7 +17,7 @@ const USE_WEB_API = param(/webapi=(true)/);
 const REC_START_BUTTON = document.querySelector('#recognizer-start-button');
 const REC_STOP_BUTTON = document.querySelector('#recognizer-stop-button');
 
-const SDK_SCRIPT = document.querySelector('script[ src *= ".speech.sdk." ]');
+// const SDK_SCRIPT = document.querySelector('script[ src *= ".speech.sdk." ]');
 
 const LOG = document.querySelector('#log');
 const RESULT = document.querySelector('#result');
@@ -171,9 +172,9 @@ function onRecognitionStop () {
 // ----------------------------------------------------
 // Error handling ??
 
-SDK_SCRIPT.addEventListener('error', ev => {
+/* SDK_SCRIPT.addEventListener('error', ev => {
   console.error('SDK error:', ev);
-});
+}); */
 
 // -----------------------------------------------------
 
