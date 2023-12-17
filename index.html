@@ -1,14 +1,15 @@
-<!doctype html><html lang="en-GB"> <title> *Adaptive speech recognition test </title>
+<!doctype html><html lang="en-GB"> <title> *Adaptive speech recognition </title>
 
 <meta name="robots" content="noindex,nofollow" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="utf-8">
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.3/gh-fork-ribbon.min.css" />
-<link rel="stylesheet" href="src/style.css" />
+<link rel="stylesheet" href="demo/style.css" />
 <link rel="icon" href="data:," /><!-- Prevent favicon 404s! -->
 
 
-<h1> Adaptive speech recognition test </h1>
+<h1> Adaptive speech recognition </h1>
 
 <p id="sdk-version"></p>
 
@@ -43,8 +44,8 @@
 <script type="importmap">
 {
   "imports": {
-    "adapt-speech-recog": "./src/index.js",
-    "patient-speech-recog": "./src/index.js",
+    "adapt-speech-recog": "./index.js",
+    "patient-speech-recog": "./index.js",
     "web-speech-recog": "./src/web-api-speech-recog.js",
     "ms-cog-speech-sdk.v1.15.1": "https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@1.15.1/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js",
     "ms-cog-speech-sdk": "https://unpkg.com/microsoft-cognitiveservices-speech-sdk@1.33.1/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js"
@@ -52,7 +53,7 @@
 }
 </script>
 
-<script type="module" src="src/example-app.js"></script>
+<script type="module" src="./demo/lib/example-app.js"></script>
 
 
 <!--  ====================================================== -->
