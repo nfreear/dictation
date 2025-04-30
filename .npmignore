@@ -1,0 +1,8 @@
+_site
+.github
+test
+CHANGELOG.md
+LICENSE
+*BAK*
+*__.js
+*.ts

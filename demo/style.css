@@ -23,17 +23,22 @@ label {
 }
 
 #actions,
+output,
 pre,
 textarea {
   background: var(--pale-grey);
   border: 1px solid var(--border-grey);
   border-radius: .25rem;
+  display: inline-block;
   font-size: small;
-  margin: 1.5rem 0;
+  margin: .5rem 0 1.5rem;
+  min-height: 1rem;
   padding: .5rem;
+  width: 100%;
 }
 
-textarea {
+output,
+.X_textarea {
   font: large/1.5 sans-serif;
   margin: 0;
   width: 98%;

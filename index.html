@@ -11,60 +11,65 @@
 
 <h1> Adaptive speech recognition </h1>
 
-<p id="sdk-version"></p>
+<form id="exampleAppForm">
 
 <p>
-  <button id="recognizer-start-button">Start dictation</button>
-  <button id="recognizer-stop-button" disabled >Stop</button>
+  <input id="sdk-version" name="sdkVersion" readonly aria-label="SDK Version">
+</p>
+
+<p>
+  <button type="submit" id="startButton">Start dictation</button>
+  <button type="reset" id="stopButton" disabled >Stop</button>
   <i id="recognizer-status" title="Recognizer stopped"></i>
 </p>
 
-
 <p>
   <label for="result">Result</label>
-  <textarea id="result" class="output" placeholder="(No result)" rows="2" readonly ></textarea>
+  <output id="result" class="output" placeholder="(No result)"></output>
 </p>
 
 <p id="actions" title="(actions)"></p>
 
-<pre id="log" title="(log)">-
-</pre>
+<p>
+  <label for="log">Log</label>
+  <textarea id="log" readonly></textarea>
+</p>
+<p>
+  <label for="options">Options</label>
+  <textarea id="options" readonly></textarea>
+</p>
 
-<pre id="options"></pre>
-
+</form>
 
 <a class="github-fork-ribbon" href="https://github.com/nfreear/dictation" data-ribbon="Fork me on GitHub" title="Fork 'nfreear/dictation' on GitHub">Fork nfreear/dictation on GitHub</a>
-
-
-<script
-  data-X-src="https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@1.15.1/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js"
-  crossorigin="anonymous"
-></script>
 
 <script type="importmap">
 {
   "imports": {
     "adaptive-speech-recog": "./index.js",
     "patient-speech-recog": "./index.js",
+    "exampleApp": "./demo/lib/example-app.js",
     "web-speech-recog": "./src/web-api-speech-recog.js",
     "ms-cog-speech-sdk.v1.15.1": "https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@1.15.1/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js",
-    "ms-cog-speech-sdk": "https://unpkg.com/microsoft-cognitiveservices-speech-sdk@1.34.0/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js"
+    "ms-cognitive-speech-sdk": "https://unpkg.com/microsoft-cognitiveservices-speech-sdk@1.43.1/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js"
   }
 }
 </script>
 
-<script type="module" src="./demo/lib/example-app.js"></script>
-
+<script type="module">
+  import exampleApp from 'exampleApp';
+  exampleApp();
+</script>
 
 <!--  ====================================================== -->
 
 <footer>
-  © 2020 Nick Freear. All rights reserved.
+  © 2025 Nick Freear. All rights reserved.
   <a href="https://github.com/nfreear/dictation">source</a>
 </footer>
 
 
-<pre class="hide">
+<pre hidden>
 
 NDF, 08-Oct-2020.
 

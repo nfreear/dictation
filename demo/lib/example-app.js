@@ -8,40 +8,34 @@
 
 // @ts-check
 
-// import 'ms-cog-speech-sdk';
-// import { createDictationRecognizerPonyfill, getDictationRecognizerConfig, fireMockActionsEvent } from 'adapt-speech-recog';
-import { createAdaptiveRecognizerPonyfill, getAdaptiveRecognizerConfig, fireMockActionsEvent } from 'adaptive-speech-recog';
+import {
+  createAdaptiveRecognizerPonyfill, getAdaptiveRecognizerConfig, fireMockActionsEvent
+} from 'adaptive-speech-recog';
 import { webApiSpeechRecogDemo } from 'web-speech-recog';
 
 const USE_WEB_API = param(/webapi=(true)/);
 
-/* const OPT = { }; */
+const FORM = document.querySelector('#exampleAppForm');
+const FORM_EL = FORM.elements;
 
-const REC_START_BUTTON = document.querySelector('#recognizer-start-button');
-const REC_STOP_BUTTON = document.querySelector('#recognizer-stop-button');
+export default function exampleApp () {
+  console.debug('Form:', FORM_EL, FORM);
 
-// const SDK_SCRIPT = document.querySelector('script[ src *= ".speech.sdk." ]');
+  console.debug('SpeechSDK:', window.SpeechSDK);
 
-const LOG = document.querySelector('#log');
-const RESULT = document.querySelector('#result');
-const PRE_OPT = document.querySelector('#options');
-const ACTIONS = document.querySelector('#actions');
-const SDK_VERSION = document.querySelector('#sdk-version');
-
-console.debug('SpeechSDK:', window.SpeechSDK);
-
-if (USE_WEB_API) {
-  webApiSpeechRecogDemo();
-} else {
-  exampleApp();
+  if (USE_WEB_API) {
+    webApiSpeechRecogDemo();
+  } else {
+    runExampleApp();
+  }
 }
 
-export function exampleApp () {
+export function runExampleApp () {
   const options = getAdaptiveRecognizerConfig(); // WAS: getDictationRecognizerConfig();
 
   if (!options.subscriptionKey || /_/.test(options.subscriptionKey)) {
     document.body.className += 'error config-error';
-    LOG.textContent = 'ERROR: Expecting a URL parameter `?key=AZURE_SPEECH_SUBSCRIPTION_KEY`.';
+    updateLog('ERROR: Expecting a URL parameter `?key=AZURE_SPEECH_SUBSCRIPTION_KEY`.');
     throw new Error('ERROR: Expecting a URL parameter `?key=AZURE_SPEECH_SUBSCRIPTION_KEY`.');
   }
 
@@ -52,15 +46,15 @@ export function exampleApp () {
   console.debug('Ponyfill:', ponyfill);
 
   recognizer.getConfiguration().then(OPT => {
-    PRE_OPT.textContent = 'Options: ' + JSON.stringify(OPT, null, 2); // Was: '\t';
+    FORM_EL.options.textContent = 'Options: ' + JSON.stringify(OPT, null, 2); // Was: '\t';
 
     if (OPT.actionPhrasesEnable) {
       const actionList = fireMockActionsEvent();
 
-      ACTIONS.innerHTML = `Suggested actions: <q>${actionList.join('</q>, <q>')}</q>`;
+      FORM_EL.actions.value = `Suggested actions: <q>${actionList.join('</q>, <q>')}</q>`;
     }
 
-    SDK_VERSION.innerHTML = `Speech SDK <i>${OPT.sdkVersion}</i>`;
+    FORM_EL.sdkVersion.value = `Speech SDK ${OPT.sdkVersion}`;
   });
 
   // recognizer.addEventListener('result', ev => console.warn('Event: result.', ev));
@@ -75,8 +69,8 @@ export function exampleApp () {
 
     console.warn('Result event:', confidence, ev);
 
-    RESULT.textContent = TEXT; // Or: RESULT.value!
-    LOG.textContent += `Result := ${TEXT} (${SOURCE})\n`;
+    FORM_EL.result.value = TEXT; // Or: RESULT.value!
+    updateLog(`Result := ${TEXT} (${SOURCE})`);
 
     if (isFinal) {
       onRecognitionStop();
@@ -87,35 +81,35 @@ export function exampleApp () {
 
   recognizer.onend = (ev) => {
     console.warn('End event:', ev);
-    LOG.textContent += '> End.\n';
+    updateLog('> End.');
 
     onRecognitionStop();
   };
 
-  recognizer.onstart = ev => {
+  recognizer.onstart = (ev) => {
     console.debug('Start event:', ev);
-    LOG.textContent += '> Start\n';
+    updateLog('> Start');
   };
 
-  recognizer.onerror = ev => {
-    const ERROR = ev.data.error;
+  recognizer.onerror = (ev) => {
+    const { error } = ev.data;
 
-    console.error('>> ERROR:', ERROR, ev);
+    console.error('>> ERROR:', error, ev);
 
     onRecognitionStop();
 
     document.body.classList.add('recognizer-error');
-    document.body.setAttribute('data-error', ERROR);
+    document.body.setAttribute('data-error', error);
 
-    if (/microphone initialization: NotAllowedError/.test(ERROR)) {
-      LOG.textContent = '> Warning: microphone blocked.';
+    if (/microphone initialization: NotAllowedError/.test(error)) {
+      updateLog('> Warning: microphone blocked.');
     }
   };
 
   // ----------------------------------------------------
   // Button events.
 
-  REC_START_BUTTON.addEventListener('click', async (ev) => {
+  FORM.addEventListener('submit', async (ev) => {
     ev.preventDefault();
     onButtonStart();
 
@@ -126,13 +120,17 @@ export function exampleApp () {
     // setTimeout(() => enumMediaDevices(), 5000);
   });
 
-  REC_STOP_BUTTON.addEventListener('click', ev => {
+  FORM.addEventListener('reset', (ev) => {
     ev.preventDefault();
 
     console.debug('Recognizer stop button clicked');
 
     recognizer.stop(() => onRecognitionStop());
   });
+
+  function updateLog (value) {
+    FORM_EL.log.value += `${value}\n`;
+  }
 }
 
 // ----------------------------------------------------
@@ -151,9 +149,12 @@ export function exampleApp () {
 }); */
 
 function onButtonStart () {
-  REC_START_BUTTON.disabled = true;
+  FORM_EL.startButton.disabled = true;
+  FORM_EL.stopButton.disabled = false;
+  FORM_EL.stopButton.focus();
+  /* REC_START_BUTTON.disabled = true;
   REC_STOP_BUTTON.disabled = false;
-  REC_STOP_BUTTON.focus();
+  REC_STOP_BUTTON.focus(); */
 }
 
 function onRecognitionStart () {
@@ -162,9 +163,12 @@ function onRecognitionStart () {
 }
 
 function onRecognitionStop () {
-  REC_STOP_BUTTON.disabled = true;
+  FORM_EL.stopButton.disabled = true;
+  FORM_EL.startButton.disbled = false;
+  FORM_EL.startButton.focus();
+  /* REC_STOP_BUTTON.disabled = true;
   REC_START_BUTTON.disabled = false;
-  REC_START_BUTTON.focus();
+  REC_START_BUTTON.focus(); */
 
   document.body.classList.add('recognizer-stopped');
   document.body.classList.remove('recognizer-started');

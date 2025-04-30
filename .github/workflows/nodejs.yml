@@ -6,7 +6,7 @@ on: [push]
 
 # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 env:
-  NODE_VERSION: 18
+  NODE_VERSION: 22
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
@@ -41,19 +41,18 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
     - run: npm ci
-    - run: npm run build --if-present
+    - run: npm run build:site --if-present
     - run: npm test
 
     # Deploy.
     - name: Setup Pages
-      uses: actions/configure-pages@v2
+      uses: actions/configure-pages@v5
     - name: Upload artifact
-      uses: actions/upload-pages-artifact@v2
+      uses: actions/upload-pages-artifact@v3
       with:
-        # Upload one directory.
-        path: '.'
+        path: _site
     - name: Deploy to GitHub Pages
       id: deployment
-      uses: actions/deploy-pages@v2
+      uses: actions/deploy-pages@v4
 
 # End.
