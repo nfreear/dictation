@@ -1,4 +1,5 @@
 [![Test status][ci-badge]][ci]
+[![NPM Version][npm-badge][npm]
 
 # adaptive-speech-recognizer
 
@@ -60,6 +61,7 @@ npm test
 
 ## Useful links
 
+ * [PAS 901:2025 Vocal accessibility in system design. Code of practice][pas]
  * [Gist: `speech-sdk.dictate.js.html`][gist];
  * [Bug: '_Can i set silence duration at end of speech ?_' (#131)][b-131];
  * [Bug: '_... I need to lengthen the dictation / "Listening" timeout_' (#3466)][b-3466]
@@ -82,6 +84,12 @@ Developed in [IET][] at [The Open University][ou] for the [ADMINS][] project, fu
 [ms]: https://microsoft.com/en-gb/ai/ai-for-accessibility-projects#:~:text=ADMINS
   "Microsoft 'AI for Accessibility' projects, including ADMINS"
 
+[pas]: https://knowledge.bsigroup.com/products/vocal-accessibility-in-system-design-code-of-practice
+  "PAS 901:2025"
+[doi]: https://dx.doi.org/10.3403/30458829
+  "DOI: 10.3403/30458829"
+[eu]: https://www.en-standard.eu/pas-901-2025-vocal-accessibility-in-system-design-code-of-practice/
+
 [gist]: https://gist.github.com/nfreear/f875994f45c97518cd8c42c786998c84
 [b-131]: https://github.com/Azure-Samples/cognitive-services-speech-sdk/issues/131
 [b-3466]: https://github.com/microsoft/BotFramework-WebChat/issues/3466
@@ -96,3 +104,5 @@ Developed in [IET][] at [The Open University][ou] for the [ADMINS][] project, fu
 
 [ci]: https://github.com/nfreear/dictation/actions "Test status ~ 'Node CI'"
 [ci-badge]: https://github.com/nfreear/dictation/workflows/Node%20CI/badge.svg
+[npm]: https://www.npmjs.com/package/adaptive-speech-recognizer
+[npm-badge]: https://img.shields.io/npm/v/adaptive-speech-recognizer
