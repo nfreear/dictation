@@ -6,8 +6,11 @@
  * @author Nick Freear, 09-October-2020.
  */
 
-import 'ms-cog-speech-sdk';
-import { createDictationRecognizerPonyfill, getDictationRecognizerConfig, fireMockActionsEvent } from 'adapt-speech-recog';
+// @ts-check
+
+// import 'ms-cog-speech-sdk';
+// import { createDictationRecognizerPonyfill, getDictationRecognizerConfig, fireMockActionsEvent } from 'adapt-speech-recog';
+import { createAdaptiveRecognizerPonyfill, getAdaptiveRecognizerConfig, fireMockActionsEvent } from 'adaptive-speech-recog';
 import { webApiSpeechRecogDemo } from 'web-speech-recog';
 
 const USE_WEB_API = param(/webapi=(true)/);
@@ -34,7 +37,7 @@ if (USE_WEB_API) {
 }
 
 export function exampleApp () {
-  const options = getDictationRecognizerConfig();
+  const options = getAdaptiveRecognizerConfig(); // WAS: getDictationRecognizerConfig();
 
   if (!options.subscriptionKey || /_/.test(options.subscriptionKey)) {
     document.body.className += 'error config-error';
@@ -42,7 +45,7 @@ export function exampleApp () {
     throw new Error('ERROR: Expecting a URL parameter `?key=AZURE_SPEECH_SUBSCRIPTION_KEY`.');
   }
 
-  const ponyfill = createDictationRecognizerPonyfill(options);
+  const ponyfill = createAdaptiveRecognizerPonyfill(options); // WAS: createDictationRecognizerPonyfill(options);
 
   const recognizer = new ponyfill.SpeechRecognition();
 

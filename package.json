@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "@nfreear/speech-dictation",
+  "name": "adaptive-speech-recognizer",
   "version": "2.0.0-beta",
   "description": "Adaptive dictation-mode speech recognizer ponyfill compatible with WebChat that gives the user time to think and stutter/stammer.",
   "license": "MIT",
@@ -12,6 +12,7 @@
   "scripts": {
     "_": "# http://localhost:8080?key=_YOUR_AZURE_SPEECH_SUBSCRIPTION_KEY&actions=true",
     "start": "npm run _ && servor",
+    "ts": "npx -p typescript tsc src/**/*.js --declaration --allowJs --emitDeclarationOnly --outDir types",
     "test": "semistandard && jest"
   },
   "devDependencies": {
@@ -19,12 +20,31 @@
     "semistandard": "^17.0.0",
     "servor": "^4.0.2"
   },
+  "peerDependencies": {
+    "microsoft-cognitiveservices-speech-sdk": "^1.34.0",
+    "web-speech-cognitive-services": "^7.1.3",
+    "react-dictate-button": "^2.0.1"
+  },
   "CDN_peerDependencies": {
     "botframework-webchat-root": "^4.10.1",
-    "microsoft-cognitiveservices-speech-sdk": "^1.15.1",
-    "speech-sdk-cdn": "https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@1.15.1/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js",
-    "react-dictate-button": "^1.2.2"
+    "sdk:1.15.1": "https://cdn.jsdelivr.net/npm/microsoft-cognitiveservices-speech-sdk@1.15.1/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js",
+    "sdk": "https://unpkg.com/microsoft-cognitiveservices-speech-sdk@1.34.0/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js"
   },
+  "keywords": [
+    "microsoft",
+    "cognitiveservices",
+    "cognitive services",
+    "speech",
+    "sdk",
+    "websocket",
+    "speechtotext",
+    "texttospeech",
+    "asr",
+    "sst",
+    "speech recognition",
+    "dictation",
+    "stammer"
+  ],
   "semistandard": {
     "env": {
       "browser": true,

@@ -1,5 +1,6 @@
 /**
- * DESIGN. Example of declaring a class INSIDE a function declaration!
+ * Not In Use.
+ * @DESIGN. Example of declaring a class INSIDE a function declaration!
  *
  * Definition of function 'createDictationRecognizerPonyfill()'
  *

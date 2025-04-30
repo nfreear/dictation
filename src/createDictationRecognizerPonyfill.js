@@ -18,18 +18,11 @@
  * @see https://github.com/compulim/web-speech-cognitive-services/blob/master/packages/component/src/SpeechServices/SpeechToText/createSpeechRecognitionPonyfill.js
  */
 
+import { SpeechConfig, SpeechRecognizer, ResultReason, CancellationReason, OutputFormat } from './SpeechSDK.js';
 import { ActionPhraseRecognizer, ACTION_DEFAULTS } from './actionPhraseRecognizer.js';
-
 // Needed for Safari -- "TypeError: function is not a constructor (evaluating 'super()')"
 import { EventTarget } from './event-target-shim.js';
-
 import { getAudioConfig } from './get-audio-config.js';
-
-// import { AudioConfig, SpeechConfig, OutputFormat, ResultReason, SpeechRecognizer } from 'SpeechSDK';
-
-const {
-  SpeechConfig, SpeechRecognizer, ResultReason, CancellationReason, OutputFormat
-} = window.SpeechSDK;
 
 const ErrorEvent = window.ErrorEvent;
 // Was: const Event = window.Event;

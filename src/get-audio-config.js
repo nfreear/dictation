@@ -5,12 +5,12 @@
  * @license (MIT)
  */
 
+import { AudioConfig, MicAudioSource } from './SpeechSDK.js';
+
 // WAS: An ugly (dangerous?) shim for Safari ...!!
 /* if (!window.AudioContext && window.webkitAudioContext) {
   window.AudioContext = window.webkitAudioContext;
 } */
-
-const { AudioConfig, MicAudioSource } = window.SpeechSDK;
 
 let audioConfig = null;
 

@@ -1,9 +1,8 @@
 [![Test status][ci-badge]][ci]
 
-# @nfreear/speech-dictation
+# adaptive-speech-recognizer
 
-An adaptive dictation-mode speech recognizer _ponyfill_ compatible with [WebChat][]
-that gives the user time to think and stutter (_stammer_)!
+An adaptive dictation-mode speech recognizer _ponyfill_ compatible with [WebChat][] that gives the user time to think and stutter (_stammer_)!
 
 > Mastering '`endSilenceTimeoutMs`' in Microsoft [Speech SDK][sdk] dictation mode!
 
@@ -14,9 +13,9 @@ _(08-Oct-2020)_
 See [Integrating with Cognitive Services Speech Services][bot-speech].
 
 ```javascript
-import { createDictationRecognizerPonyfill } from './createDictationRecognizerPonyfill.js';
+import { createAdaptiveRecognizerPonyfill } from 'adaptive-speech-recognizer';
 
-const asrPonyfill = await createDictationRecognizerPonyfill({ region, key });
+const asrPonyfill = await createAdaptiveRecognizerPonyfill({ region, key });
 
 // ... Combine speech synthesis from default
 // 'createCognitiveServicesSpeechServicesPonyfillFactory()' ...
@@ -33,8 +32,7 @@ renderWebChat(
 
 ## Dictation mode
 
-The key lines in `createDictationRecognizerPonyfill` to force dictation mode,
-and enable the setting of `initialSilenceTimeoutMs` and `endSilenceTimeoutMs`:
+The key lines in `createAdaptiveRecognizerPonyfill` to force dictation mode, and enable the setting of `initialSilenceTimeoutMs` and `endSilenceTimeoutMs`:
 
 ```javascript
 const initialSilenceTimeoutMs = 5 * 1000;
