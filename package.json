@@ -16,7 +16,7 @@
   },
   "type": "module",
   "scripts": {
-    "build:site": "cp -R *.js src demo _site",
+    "build:site": "cp -R *.js *.html src demo _site",
     "_": "# http://localhost:8080?key=_YOUR_AZURE_SPEECH_SUBSCRIPTION_KEY&actions=true",
     "start": "npm run _ && servor",
     "ts": "npx -p typescript tsc src/**/*.js --declaration --allowJs --emitDeclarationOnly --outDir types",
