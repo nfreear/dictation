@@ -3,7 +3,10 @@
   "version": "2.1.0",
   "description": "Adaptive dictation-mode speech recognizer ponyfill compatible with WebChat that gives the user time to think and stutter/stammer.",
   "license": "MIT",
-  "repository": "https://github.com/nfreear/dictation.git",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nfreear/dictation.git"
+  },
   "author": "Nick Freear",
   "main": "index.js",
   "exports": {
