@@ -4,9 +4,9 @@
  * @author Nick Freear, 25-October-2020.
  */
 
-import { EVENT_INCOMING_ACT } from '../src/config.DIST.js';
+import { EVENT_INCOMING_ACT } from '../index.js';
 
-const Event = window.Event;
+const { Event } = window;
 
 // Was: export const EVENT_INCOMING_ACT = 'webchat:incoming_activity';
 
@@ -65,7 +65,7 @@ const MOCK_ACTIVITY = {
   }
 };
 
-export function fireMockActionsEvent () {
+export default function fireMockActionsEvent () {
   const event = new Event(EVENT_INCOMING_ACT);
 
   event.data = MOCK_ACTIVITY.payload.activity;

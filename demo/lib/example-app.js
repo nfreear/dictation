@@ -8,10 +8,9 @@
 
 // @ts-check
 
-import {
-  createAdaptiveRecognizerPonyfill, getAdaptiveRecognizerConfig, fireMockActionsEvent
-} from 'adaptive-speech-recog';
-import { webApiSpeechRecogDemo } from 'web-speech-recog';
+import { createAdaptiveRecognizerPonyfill, getAdaptiveRecognizerConfig } from 'adaptive-speech-recognizer';
+import fireMockActionsEvent from 'fireMockActionsEvent';
+import webApiSpeechRecogDemo from 'webApiSpeechRecogDemo';
 
 const USE_WEB_API = param(/webapi=(true)/);
 

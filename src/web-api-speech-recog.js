@@ -51,6 +51,8 @@ export function webApiSpeechRecogDemo () {
   });
 }
 
+export default webApiSpeechRecogDemo;
+
 /*
 Events sequence:
 

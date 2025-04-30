@@ -24,7 +24,6 @@ label {
 
 #actions,
 output,
-pre,
 textarea {
   background: var(--pale-grey);
   border: 1px solid var(--border-grey);
@@ -50,6 +49,7 @@ output,
   font-size: medium;
 }
 
+#options,
 #log {
   min-height: 10rem;
 }
@@ -93,7 +93,7 @@ output,
   cursor: wait;
 }
 
-footer a[ href *= github ],
+/* footer a[ href *= github ], */
 .github-fork-ribbon:before,
 .github-fork-ribbon:after,
 .hide {
