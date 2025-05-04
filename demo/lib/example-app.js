@@ -8,7 +8,8 @@
 
 // @ts-check
 
-import { createAdaptiveRecognizerPonyfill, getAdaptiveRecognizerConfig } from 'adaptive-speech-recognizer';
+// import 'ms-cognitive-speech-sdk';
+// import { createAdaptiveRecognizerPonyfill, getAdaptiveRecognizerConfig } from 'adaptive-speech-recognizer';
 import fireMockActionsEvent from 'fireMockActionsEvent';
 import webApiSpeechRecogDemo from 'webApiSpeechRecogDemo';
 
@@ -17,19 +18,21 @@ const USE_WEB_API = param(/webapi=(true)/);
 const FORM = document.querySelector('#exampleAppForm');
 const FORM_EL = FORM.elements;
 
-export default function exampleApp () {
+export default async function exampleApp () {
   console.debug('Form:', FORM_EL, FORM);
-
-  console.debug('SpeechSDK:', window.SpeechSDK);
 
   if (USE_WEB_API) {
     webApiSpeechRecogDemo();
   } else {
-    runExampleApp();
+    await runExampleApp();
+    console.debug('SpeechSDK:', window.SpeechSDK);
   }
 }
 
-export function runExampleApp () {
+export async function runExampleApp () {
+  await import('ms-cognitive-speech-sdk');
+  const { createAdaptiveRecognizerPonyfill, getAdaptiveRecognizerConfig } = await import('adaptive-speech-recognizer');
+
   const options = getAdaptiveRecognizerConfig(); // WAS: getDictationRecognizerConfig();
 
   if (!options.subscriptionKey || /_/.test(options.subscriptionKey)) {
@@ -45,7 +48,7 @@ export function runExampleApp () {
   console.debug('Ponyfill:', ponyfill);
 
   recognizer.getConfiguration().then(OPT => {
-    FORM_EL.options.textContent = 'Options: ' + JSON.stringify(OPT, null, 2); // Was: '\t';
+    FORM_EL.options.value = 'Options: ' + JSON.stringify(OPT, null, 2); // Was: '\t';
 
     if (OPT.actionPhrasesEnable) {
       const actionList = fireMockActionsEvent();
@@ -60,16 +63,15 @@ export function runExampleApp () {
 
   recognizer.onresult = (ev) => {
     const firstResult = ev.results[0];
-    const TEXT = firstResult[0].transcript;
     // Was: const TEXT = ev._data.results[0][0].transcript;
-    const confidence = firstResult[0].confidence;
-    const isFinal = firstResult.isFinal;
-    const SOURCE = ev.data.source;
+    const { confidence, transcript } = firstResult[0];
+    const { isFinal } = firstResult;
+    const { source } = ev.data;
 
     console.warn('Result event:', confidence, ev);
 
-    FORM_EL.result.value = TEXT; // Or: RESULT.value!
-    updateLog(`Result := ${TEXT} (${SOURCE})`);
+    FORM_EL.result.value = transcript; // Or: RESULT.value!
+    updateLog(`Result := ${transcript} (${source})`);
 
     if (isFinal) {
       onRecognitionStop();
@@ -151,9 +153,6 @@ function onButtonStart () {
   FORM_EL.startButton.disabled = true;
   FORM_EL.stopButton.disabled = false;
   FORM_EL.stopButton.focus();
-  /* REC_START_BUTTON.disabled = true;
-  REC_STOP_BUTTON.disabled = false;
-  REC_STOP_BUTTON.focus(); */
 }
 
 function onRecognitionStart () {
@@ -163,11 +162,8 @@ function onRecognitionStart () {
 
 function onRecognitionStop () {
   FORM_EL.stopButton.disabled = true;
-  FORM_EL.startButton.disbled = false;
+  FORM_EL.startButton.disabled = false;
   FORM_EL.startButton.focus();
-  /* REC_STOP_BUTTON.disabled = true;
-  REC_START_BUTTON.disabled = false;
-  REC_START_BUTTON.focus(); */
 
   document.body.classList.add('recognizer-stopped');
   document.body.classList.remove('recognizer-started');

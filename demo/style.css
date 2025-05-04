@@ -12,17 +12,19 @@ body {
   padding: 0 .8rem;
 }
 
-button {
+[ type = submit ],
+[ type = reset ] {
   cursor: pointer;
   font-size: large;
   padding: .6rem 2rem;
 }
 
-label {
+p label {
   display: block;
 }
 
 #actions,
+input,
 output,
 textarea {
   background: var(--pale-grey);
@@ -36,7 +38,14 @@ textarea {
   width: 100%;
 }
 
-output,
+output {
+  white-space: pre-wrap;
+}
+
+input {
+  font-size: large;
+}
+
 .X_textarea {
   font: large/1.5 sans-serif;
   margin: 0;

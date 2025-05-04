@@ -14,7 +14,7 @@
 <form id="exampleAppForm">
 
 <p>
-  <input id="sdk-version" name="sdkVersion" readonly aria-label="SDK Version">
+  <output id="sdkVersion" aria-label="Version" aria-live="off"></output>
 </p>
 
 <p>
@@ -25,19 +25,22 @@
 
 <p>
   <label for="result">Result</label>
-  <output id="result" class="output" placeholder="(No result)"></output>
+  <output id="result" class="output"></output>
 </p>
 
 <p id="actions" title="(actions)"></p>
 
 <p>
   <label for="log">Log</label>
-  <textarea id="log" readonly></textarea>
+  <output id="log" aria-live="off"></output>
 </p>
-<p>
-  <label for="options">Options</label>
-  <textarea id="options" readonly></textarea>
-</p>
+
+<details>
+  <summary>
+    <label for="options">Options</label>
+  </summary>
+  <output id="options" aria-live="off"></output>
+</details>
 
 </form>
 

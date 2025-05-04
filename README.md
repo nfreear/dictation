@@ -1,5 +1,6 @@
 [![Test status][ci-badge]][ci]
-[![NPM Version][npm-badge][npm]
+[![NPM Version][npm-badge]][npm]
+[![PAS 901:2025][pas-badge]][pas]
 
 # adaptive-speech-recognizer
 
@@ -8,6 +9,22 @@ An adaptive dictation-mode speech recognizer _ponyfill_ compatible with [WebChat
 > Mastering '`endSilenceTimeoutMs`' in Microsoft [Speech SDK][sdk] dictation mode!
 
 _(08-Oct-2020)_
+
+## Basic usage
+
+```js
+import 'ms-cognitive-speech-sdk';
+import createAdaptiveRecognizerPonyfill from 'adaptive-speech-recognizer';
+
+const ponyfill = createAdaptiveRecognizerPonyfill({
+  subscriptionKey,
+  region,
+  endSilenceTimeoutMs
+});
+
+const recognizer = new ponyfill.SpeechRecognition();
+recognizer.start();
+```
 
 ## Ponyfill
 
@@ -33,7 +50,7 @@ renderWebChat(
 
 ## Dictation mode
 
-The key lines in `createAdaptiveRecognizerPonyfill` to force dictation mode, and enable the setting of `initialSilenceTimeoutMs` and `endSilenceTimeoutMs`:
+The [key lines in `createCognitiveRecognizer`][key] to force dictation mode, and enable the setting of `initialSilenceTimeoutMs` and `endSilenceTimeoutMs`:
 
 ```javascript
 const initialSilenceTimeoutMs = 5 * 1000;
@@ -85,14 +102,20 @@ Developed in [IET][] at [The Open University][ou] for the [ADMINS][] project, fu
   "Microsoft 'AI for Accessibility' projects, including ADMINS"
 
 [pas]: https://knowledge.bsigroup.com/products/vocal-accessibility-in-system-design-code-of-practice
-  "PAS 901:2025"
+  "PAS 901:2025 Vocal accessibility in system design. Code of practice"
+[pas-badge]: https://img.shields.io/badge/PAS-901%3A2025-teal
 [doi]: https://dx.doi.org/10.3403/30458829
   "DOI: 10.3403/30458829"
 [eu]: https://www.en-standard.eu/pas-901-2025-vocal-accessibility-in-system-design-code-of-practice/
 
+[key]: https://github.com/nfreear/dictation/blob/main/src/createDictationRecognizerPonyfill.js#L527-L540
+  "'createCognitiveRecognizer()' function, lines 527-540"
+
 [gist]: https://gist.github.com/nfreear/f875994f45c97518cd8c42c786998c84
 [b-131]: https://github.com/Azure-Samples/cognitive-services-speech-sdk/issues/131
 [b-3466]: https://github.com/microsoft/BotFramework-WebChat/issues/3466
+[b-502]: https://github.com/Azure-Samples/cognitive-services-speech-sdk/issues/502
+  "Minimum/Maximum values for InitialSilence and EndSilence timeouts for java SDK (#502) (2020)"
 [sdk]: https://github.com/microsoft/cognitive-services-speech-sdk-js
 [webchat]: https://github.com/Microsoft/BotFramework-WebChat
 [bot-speech]: https://github.com/Microsoft/BotFramework-WebChat/blob/master/docs/SPEECH.md#integrating-web-chat-into-your-page
