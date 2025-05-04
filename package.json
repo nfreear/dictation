@@ -8,15 +8,16 @@
     "url": "git+https://github.com/nfreear/dictation.git"
   },
   "author": "Nick Freear",
+  "type": "module",
   "main": "index.js",
   "exports": {
     ".": "./index.js",
     "./example-app": "./demo/lib/example-app.js",
+    "./fireMockActionsEvent": "./test/fireMockActionsEvent.js",
     "./webApiSpeechRecog": "./src/web-api-speech-recog.js"
   },
-  "type": "module",
   "scripts": {
-    "build:site": "cp -R *.js *.html src demo _site",
+    "build:site": "cp -R *.js *.html src demo test _site",
     "_": "# http://localhost:8080?key=_YOUR_AZURE_SPEECH_SUBSCRIPTION_KEY&actions=true",
     "start": "npm run _ && servor",
     "ts": "npx -p typescript tsc src/**/*.js --declaration --allowJs --emitDeclarationOnly --outDir types",

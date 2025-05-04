@@ -4,7 +4,7 @@
  * @author Nick Freear, 25-October-2020.
  */
 
-import { EVENT_INCOMING_ACT } from '../index.js';
+import { EVENT_INCOMING_ACT } from '../src/config.DIST.js'; // Was: '../index.js';
 
 const { Event } = window;
 
