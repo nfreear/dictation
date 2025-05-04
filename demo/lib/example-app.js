@@ -1,11 +1,3 @@
-/**
- * A demo application of the dictation-mode speech recognizer.
- *
- * @license MIT.
- * @copyright © 2020 Nick Freear.
- * @author Nick Freear, 09-October-2020.
- */
-
 // @ts-check
 
 // import 'ms-cognitive-speech-sdk';
@@ -13,55 +5,106 @@
 import fireMockActionsEvent from 'fireMockActionsEvent';
 import webApiSpeechRecogDemo from 'webApiSpeechRecogDemo';
 
-const USE_WEB_API = param(/webapi=(true)/);
+const { customElements, HTMLElement } = window;
 
-const FORM = document.querySelector('#exampleAppForm');
-const FORM_EL = FORM.elements;
+/**
+ * A demo application of the dictation-mode speech recognizer.
+ *
+ * @license MIT.
+ * @copyright © 2020 Nick Freear.
+ * @author Nick Freear, 09-October-2020.
+ */
+export class ExampleRecognizerAppElement extends HTMLElement {
+  get _form () { return this.querySelector('form'); }
+  get _elements () { return this._form.elements; }
+  get _storageElems () { return this.querySelectorAll('my-local-storage'); }
+  get _SpeechSDK () { return window.SpeechSDK; }
+  get _sdkVersion () { return this._options.sdkVersion; }
 
-export default async function exampleApp () {
-  console.debug('Form:', FORM_EL, FORM);
+  async connectedCallback () {
+    console.assert(this._elements.length === 6, '<form>.elements - Expecting a different number!');
+    console.assert(this._storageElems.length === 2, '<my-local-storage> - Expecting a different number!');
 
-  if (USE_WEB_API) {
-    webApiSpeechRecogDemo();
-  } else {
-    await runExampleApp();
-    console.debug('SpeechSDK:', window.SpeechSDK);
+    this._useWebApi = this._param(/webapi=(true)/);
+
+    if (this._useWebApi) {
+      webApiSpeechRecogDemo();
+    } else {
+      await this._runExampleApp();
+    }
+
+    console.debug('example-recognizer-app:', this._elements, [this]);
   }
-}
 
-export async function runExampleApp () {
-  await import('ms-cognitive-speech-sdk');
-  const { createAdaptiveRecognizerPonyfill, getAdaptiveRecognizerConfig } = await import('adaptive-speech-recognizer');
+  async _runExampleApp () {
+    await import('ms-cognitive-speech-sdk');
+    const { createAdaptiveRecognizerPonyfill, getAdaptiveRecognizerConfig } = await import('adaptive-speech-recognizer');
 
-  const options = getAdaptiveRecognizerConfig(); // WAS: getDictationRecognizerConfig();
+    const options = getAdaptiveRecognizerConfig(); // WAS: getDictationRecognizerConfig();
 
-  if (!options.subscriptionKey || /_/.test(options.subscriptionKey)) {
-    document.body.className += 'error config-error';
-    updateLog('ERROR: Expecting a URL parameter `?key=AZURE_SPEECH_SUBSCRIPTION_KEY`.');
-    throw new Error('ERROR: Expecting a URL parameter `?key=AZURE_SPEECH_SUBSCRIPTION_KEY`.');
+    if (!options.subscriptionKey || /_/.test(options.subscriptionKey)) {
+      document.body.className += 'error config-error';
+      this._updateLog('ERROR: Expecting a URL parameter `?key=AZURE_SPEECH_SUBSCRIPTION_KEY`.');
+      throw new Error('ERROR: Expecting a URL parameter `?key=AZURE_SPEECH_SUBSCRIPTION_KEY`.');
+    }
+
+    this._ponyfill = createAdaptiveRecognizerPonyfill(options); // WAS: createDictationRecognizerPonyfill(options);
+
+    this._recognizer = new this._ponyfill.SpeechRecognition();
+
+    this._recognizer.getConfiguration().then((opt) => this._onConfiguration(opt));
+    this._recognizer.onresult = (ev) => this._onresult(ev);
+    this._recognizer.onend = (ev) => this._onend(ev);
+    this._recognizer.onstart = (ev) => this._onstart(ev);
+    this._recognizer.onerror = (ev) => this._onerror(ev);
+
+    this._form.addEventListener('submit', (ev) => this._onFormSubmitEvent(ev));
+    this._form.addEventListener('reset', (ev) => this._onFormResetEvent(ev));
+
+    console.debug('Ponyfill:', this._ponyfill);
   }
 
-  const ponyfill = createAdaptiveRecognizerPonyfill(options); // WAS: createDictationRecognizerPonyfill(options);
+  /* FORM events.
+  */
 
-  const recognizer = new ponyfill.SpeechRecognition();
+  _onFormSubmitEvent (ev) {
+    ev.preventDefault();
+    this._onButtonStart();
 
-  console.debug('Ponyfill:', ponyfill);
+    console.debug('Recognizer start button clicked');
 
-  recognizer.getConfiguration().then(OPT => {
-    FORM_EL.options.value = 'Options: ' + JSON.stringify(OPT, null, 2); // Was: '\t';
+    this._recognizer.start();
+
+    // setTimeout(() => enumMediaDevices(), 5000);
+  }
+
+  _onFormResetEvent (ev) {
+    ev.preventDefault();
+    console.debug('Recognizer stop button clicked');
+
+    this._recognizer.stop(() => this._onRecognitionStop());
+  }
+
+  /* Recognizer events.
+  */
+
+  _onConfiguration (OPT) {
+    this._options = OPT;
+    this._elements.options.value = 'Options: ' + JSON.stringify(OPT, null, 2); // Was: '\t';
 
     if (OPT.actionPhrasesEnable) {
       const actionList = fireMockActionsEvent();
 
-      FORM_EL.actions.value = `Suggested actions: <q>${actionList.join('</q>, <q>')}</q>`;
+      this._elements.actions.value = `Suggested actions: <q>${actionList.join('</q>, <q>')}</q>`;
     }
 
-    FORM_EL.sdkVersion.value = `Speech SDK ${OPT.sdkVersion}`;
-  });
+    this._elements.sdkVersion.value = `Speech SDK ${this._sdkVersion}`;
+    this.dataset.sdkVersion = this._sdkVersion;
 
-  // recognizer.addEventListener('result', ev => console.warn('Event: result.', ev));
+    console.debug('SpeechSDK:', this._sdkVersion, this._SpeechSDK);
+  }
 
-  recognizer.onresult = (ev) => {
+  _onresult (ev) {
     const firstResult = ev.results[0];
     // Was: const TEXT = ev._data.results[0][0].transcript;
     const { confidence, transcript } = firstResult[0];
@@ -70,69 +113,73 @@ export async function runExampleApp () {
 
     console.warn('Result event:', confidence, ev);
 
-    FORM_EL.result.value = transcript; // Or: RESULT.value!
-    updateLog(`Result := ${transcript} (${source})`);
+    this._elements.result.value = transcript; // Or: RESULT.value!
+    this._updateLog(`Result := ${transcript} (${source})`);
 
     if (isFinal) {
-      onRecognitionStop();
+      this._onRecognitionStop();
     } else {
-      onRecognitionStart();
+      this._onRecognitionStart();
     }
-  };
+  }
 
-  recognizer.onend = (ev) => {
+  _onend (ev) {
     console.warn('End event:', ev);
-    updateLog('> End.');
+    this._updateLog('> End.');
 
-    onRecognitionStop();
-  };
+    this._onRecognitionStop();
+  }
 
-  recognizer.onstart = (ev) => {
+  _onstart (ev) {
     console.debug('Start event:', ev);
-    updateLog('> Start');
-  };
+    this._updateLog('> Start');
+    this.dataset.recognizerState = 'started';
+  }
 
-  recognizer.onerror = (ev) => {
+  _onerror (ev) {
     const { error } = ev.data;
 
     console.error('>> ERROR:', error, ev);
 
-    onRecognitionStop();
+    this._onRecognitionStop();
 
-    document.body.classList.add('recognizer-error');
-    document.body.setAttribute('data-error', error);
+    // Was: document.body!
+    this.classList.add('recognizer-error');
+    this.dataset.recognizerState = 'error';
+    this.dataset.error = error; // to string?
 
     if (/microphone initialization: NotAllowedError/.test(error)) {
-      updateLog('> Warning: microphone blocked.');
+      this._updateLog('> Warning: microphone blocked.');
     }
-  };
+  }
 
-  // ----------------------------------------------------
-  // Button events.
+  _onButtonStart () {
+    this._elements.startButton.disabled = true;
+    this._elements.stopButton.disabled = false;
+    this._elements.stopButton.focus();
+  }
 
-  FORM.addEventListener('submit', async (ev) => {
-    ev.preventDefault();
-    onButtonStart();
+  _onRecognitionStop () {
+    this._elements.stopButton.disabled = true;
+    this._elements.startButton.disabled = false;
+    this._elements.startButton.focus();
 
-    console.debug('Recognizer start button clicked');
+    this.dataset.recognizerState = 'stopped';
 
-    recognizer.start();
+    console.warn('onRecognitionStop:', this.dataset);
+  }
 
-    // setTimeout(() => enumMediaDevices(), 5000);
-  });
+  _param (regex, def = null) {
+    const matches = window.location.href.match(regex);
+    return matches ? matches[1] : def;
+  }
 
-  FORM.addEventListener('reset', (ev) => {
-    ev.preventDefault();
-
-    console.debug('Recognizer stop button clicked');
-
-    recognizer.stop(() => onRecognitionStop());
-  });
-
-  function updateLog (value) {
-    FORM_EL.log.value += `${value}\n`;
+  _updateLog (value) {
+    this._elements.log.value += `${value}\n`;
   }
 }
+
+customElements.define('example-recognizer-app', ExampleRecognizerAppElement);
 
 // ----------------------------------------------------
 
@@ -148,28 +195,6 @@ export async function runExampleApp () {
     LOG.textContent = '> Warning: microphone blocked.';
   }
 }); */
-
-function onButtonStart () {
-  FORM_EL.startButton.disabled = true;
-  FORM_EL.stopButton.disabled = false;
-  FORM_EL.stopButton.focus();
-}
-
-function onRecognitionStart () {
-  document.body.classList.add('recognizer-started');
-  document.body.classList.remove('recognizer-stopped');
-}
-
-function onRecognitionStop () {
-  FORM_EL.stopButton.disabled = true;
-  FORM_EL.startButton.disabled = false;
-  FORM_EL.startButton.focus();
-
-  document.body.classList.add('recognizer-stopped');
-  document.body.classList.remove('recognizer-started');
-
-  console.warn('onRecognitionStop:', document.body, document.body.classList);
-}
 
 // ----------------------------------------------------
 // Error handling ??
@@ -193,8 +218,3 @@ export function enumMediaDevices () {
 }
 
 // ----------------------------------------------------
-
-function param (regex, def = null) {
-  const matches = window.location.href.match(regex);
-  return matches ? matches[1] : def;
-}

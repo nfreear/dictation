@@ -1,4 +1,4 @@
-<!doctype html><html lang="en-GB"> <title> *Adaptive speech recognition </title>
+<!doctype html><html lang="en-GB" class="app-page"> <title> *Adaptive speech recognition </title>
 
 <meta name="robots" content="noindex,nofollow" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -11,7 +11,9 @@
 
 <h1> Adaptive speech recognition </h1>
 
-<form id="exampleAppForm">
+<example-recognizer-app>
+
+<form>
 
 <p>
   <output id="sdkVersion" aria-label="Version" aria-live="off"></output>
@@ -44,13 +46,15 @@
 
 </form>
 
+</example-recognizer-app>
+
 <a class="github-fork-ribbon" href="https://github.com/nfreear/dictation" data-ribbon="Fork me on GitHub" title="Fork 'nfreear/dictation' on GitHub">Fork nfreear/dictation on GitHub</a>
 
 <script type="importmap">
 {
   "imports": {
     "adaptive-speech-recognizer": "./index.js",
-    "exampleApp": "./demo/lib/example-app.js",
+    "ExampleRecognizerAppElement": "./demo/lib/example-app.js",
     "webApiSpeechRecogDemo": "./src/web-api-speech-recog.js",
     "fireMockActionsEvent": "./test/fireMockActionsEvent.js",
     "ms-cognitive-speech-sdk": "https://unpkg.com/microsoft-cognitiveservices-speech-sdk@1.43.1/distrib/browser/microsoft.cognitiveservices.speech.sdk.bundle-min.js"
@@ -59,8 +63,7 @@
 </script>
 
 <script type="module">
-  import exampleApp from 'exampleApp';
-  exampleApp();
+  import 'ExampleRecognizerAppElement';
 </script>
 
 <!--  ====================================================== -->

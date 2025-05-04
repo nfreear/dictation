@@ -1,0 +1,64 @@
+<!doctype html><html lang="en" class="config-page"> <title>Adaptive speech recognition - Configuration</title>
+
+<meta name="robots" content="noindex,nofollow" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="utf-8">
+
+<link rel="stylesheet" href="style.css">
+
+<h1>Adaptive speech recognition</h1>
+
+<nav>
+  <p>&larr;<a href="../index.html">To Recognizer App</a></p>
+</nav>
+
+<h2>Configuration</h2>
+
+<example-recognizer-config>
+
+<form>
+
+  <p>
+    <label for="key">Azure Speech Key</label>
+    <input id="key" type="password" autocomplete="off" minlength="30" maxlength="40" required>
+    <button type="button" id="showButton" aria-pressed="false">Show</button>
+    <my-local-storage key="PASR:key" selector="#key"></my-local-storage>
+  </p>
+
+  <p>
+    <label for="region">Region</label>
+    <input id="region" list="regionList" minlength="6" maxlength="20" required>
+    <datalist id="regionList">
+      <option>uksouth</option>
+      <option>westeurope</option>
+    </datalist>
+    <my-local-storage key="PASR:region" selector="#region"></my-local-storage>
+  </p>
+
+  <p>
+    <button type="submit">Save</button>
+  </p>
+</form>
+
+</example-recognizer-config>
+
+
+<script type="importmap">
+{
+  "imports": {
+    "x:exampleApp": "./lib/example-app.js",
+    "x:asr": "../index.js",
+    "ExampleRecognizerConfigElement": "./lib/ExampleRecognizerConfigElement.js",
+    "MyElements": "https://nfreear.github.io/elements/i.js"
+  },
+  "myElements": {
+    "use": [ "my-local-storage" ]
+  }
+}
+</script>
+
+<script type="module">
+  import 'ExampleRecognizerConfigElement';
+</script>
+
+</html>
