@@ -1,7 +1,11 @@
 _site
+_test
 .github
 CHANGELOG.md
 LICENSE
 *BAK*
 *__.js
 *.ts
+
+ExampleRecognizerConfigElement.js
+config.html

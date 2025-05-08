@@ -1,6 +1,6 @@
 {
   "name": "adaptive-speech-recognizer",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Adaptive dictation-mode speech recognizer ponyfill compatible with WebChat that gives the user time to think and stutter/stammer.",
   "license": "MIT",
   "repository": {
@@ -52,6 +52,7 @@
     "sst",
     "speech recognition",
     "dictation",
+    "stutter",
     "stammer"
   ],
   "semistandard": {
