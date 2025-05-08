@@ -121,6 +121,12 @@ export function toSentence (text) {
 
 // ------------------------------------------------------------------
 
+/**
+ * Factory function - create SpeechRecognition class from cognitive recognizer.
+ * @param {Function} - createRecognizer function.
+ * @param {DictationOptions} - Options object.
+ * @return {SpeechRecognition}
+ */
 function createSpeechRecognitionFromRecognizer (createRecognizer, options) {
   // Extend options with the defaults.
   const _OPT = { ...DEFAULTS, ...options };
@@ -553,6 +559,11 @@ function createCognitiveRecognizer (options) {
 
 // ------------------------------------------------------------------
 
+/**
+ * The main function, to create an adaptive speech recognizer 'Ponyfill' object.
+ * @param {DictationOptions} - Options object.
+ * @return {Ponyfill}
+ */
 export function createDictationRecognizerPonyfill (options) {
   // WAS: const recognizer = createCognitiveRecognizer(options);
 
