@@ -20,6 +20,7 @@ export class ExampleRecognizerAppElement extends HTMLElement {
   get _storageElems () { return this.querySelectorAll('my-local-storage'); }
   get _SpeechSDK () { return window.SpeechSDK; }
   get _sdkVersion () { return this._options.sdkVersion; }
+  get _microphoneErrorRegex () { return /microphone initialization: NotAllowedError/; }
 
   async connectedCallback () {
     console.assert(this._elements.length === 6, '<form>.elements - Expecting a different number!');
@@ -43,7 +44,8 @@ export class ExampleRecognizerAppElement extends HTMLElement {
     const options = getAdaptiveRecognizerConfig(); // WAS: getDictationRecognizerConfig();
 
     if (!options.subscriptionKey || /_/.test(options.subscriptionKey)) {
-      document.body.className += 'error config-error';
+      this.dataset.state = 'error';
+      this.dataset.errorType = 'config-error';
       this._updateLog('ERROR: Expecting a URL parameter `?key=AZURE_SPEECH_SUBSCRIPTION_KEY`.');
       throw new Error('ERROR: Expecting a URL parameter `?key=AZURE_SPEECH_SUBSCRIPTION_KEY`.');
     }
@@ -99,7 +101,7 @@ export class ExampleRecognizerAppElement extends HTMLElement {
     }
 
     this._elements.sdkVersion.value = `Speech SDK ${this._sdkVersion}`;
-    this.dataset.sdkVersion = this._sdkVersion;
+    this.dataset.speechSdkVersion = this._sdkVersion;
 
     console.debug('SpeechSDK:', this._sdkVersion, this._SpeechSDK);
   }
@@ -113,13 +115,15 @@ export class ExampleRecognizerAppElement extends HTMLElement {
 
     console.warn('Result event:', confidence, ev);
 
+    this.dataset.confidence = confidence;
     this._elements.result.value = transcript; // Or: RESULT.value!
     this._updateLog(`Result := ${transcript} (${source})`);
 
     if (isFinal) {
       this._onRecognitionStop();
     } else {
-      this._onRecognitionStart();
+      this.dataset.recognizerState = 'started';
+      // Was: this._onRecognitionStart();
     }
   }
 
@@ -146,9 +150,11 @@ export class ExampleRecognizerAppElement extends HTMLElement {
     // Was: document.body!
     this.classList.add('recognizer-error');
     this.dataset.recognizerState = 'error';
-    this.dataset.error = error; // to string?
+    this.dataset.errorType = 'recognizer-error';
+    this.dataset.errorDetail = error; // to string?
 
-    if (/microphone initialization: NotAllowedError/.test(error)) {
+    if (this._microphoneErrorRegex.test(error)) {
+      this.dataset.warning = 'microphone-blocked';
       this._updateLog('> Warning: microphone blocked.');
     }
   }
